@@ -1,7 +1,6 @@
 use std::cmp;
 use std::ops;
 
-
 pub const EPSILON: f32 = f32::EPSILON * 10.0;
 
 #[derive(Copy, Clone, Debug)]
@@ -14,7 +13,7 @@ impl Vec2 {
     pub fn new(x: f32, y: f32) -> Vec2 {
         Vec2 { x, y }
     }
-    
+
     #[inline]
     pub fn nearly_zero(&self) -> bool {
         f32::abs(self.x) <= EPSILON && f32::abs(self.y) <= EPSILON
@@ -23,8 +22,7 @@ impl Vec2 {
     #[allow(dead_code)]
     #[inline]
     pub fn nearly_eq(&self, other: Vec2) -> bool {
-        f32::abs(self.x - other.x) <= EPSILON
-            && f32::abs(self.y - other.y) <= EPSILON
+        f32::abs(self.x - other.x) <= EPSILON && f32::abs(self.y - other.y) <= EPSILON
     }
 
     #[inline]
@@ -139,7 +137,6 @@ impl ops::Div<f32> for Vec2 {
         Vec2::new(self.x * factor, self.y * factor)
     }
 }
-
 
 #[cfg(test)]
 mod tests {
