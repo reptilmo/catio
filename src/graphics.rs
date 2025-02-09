@@ -1,29 +1,14 @@
 use sdl2::pixels::Color;
 use sdl2::rect::Point;
 use sdl2::render::WindowCanvas;
-use sdl2::video::Window;
-use sdl2::VideoSubsystem;
 
 pub struct Graphics {
-    window: Window,
     canvas: WindowCanvas,
 }
 
 impl Graphics {
-    pub fn create(video: &VideoSubsystem, width: u32, height: u32, _fullscreen: bool) -> Self {
-        // TODO: Fullscreen.
-        let wnd = video
-            .window("", width, height)
-            .position_centered()
-            .build()
-            .unwrap();
-
-        let cnv = wnd.clone().into_canvas().build().unwrap();
-
-        Self {
-            window: wnd,
-            canvas: cnv,
-        }
+    pub fn new(canvas: WindowCanvas) -> Self {
+        Self { canvas }
     }
 
     pub fn begin_frame(&mut self) {
