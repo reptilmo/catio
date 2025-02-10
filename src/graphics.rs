@@ -1,6 +1,8 @@
 use sdl2::pixels::Color;
 use sdl2::rect::Point;
+use sdl2::rect::Rect;
 use sdl2::render::WindowCanvas;
+use sdl2::surface::Surface;
 
 pub struct Graphics {
     canvas: WindowCanvas,
@@ -9,6 +11,24 @@ pub struct Graphics {
 impl Graphics {
     pub fn new(canvas: WindowCanvas) -> Self {
         Self { canvas }
+    }
+
+    pub fn copy_from_surface(&mut self, surface: &Surface) {
+        let texture_creator = self.canvas.texture_creator();
+        let result = texture_creator.create_texture_from_surface(surface);
+        let texture = match result {
+            Ok(tex) => tex,
+            Err(e) => {
+                eprintln!("{}", e);
+                return;
+            }
+        };
+        let dst = Rect::new(0, 0, 96, 24);
+        let result = self.canvas.copy(&texture, None, Some(dst));
+        match result {
+            Err(e) => eprintln!("{}", e),
+            Ok(_) => (),
+        };
     }
 
     pub fn begin_frame(&mut self) {
