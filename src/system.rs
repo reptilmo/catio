@@ -86,7 +86,7 @@ impl System {
         F: Fn(&mut Input, &mut Graphics, &Surface, f32) -> bool,
     {
         let path = Path::new(&self.system_font_path);
-        let result = self.ttf_context.load_font(path, 24);
+        let result = self.ttf_context.load_font(path, 16);
         let font = match result {
             Ok(f) => f,
             Err(e) => {
@@ -96,6 +96,7 @@ impl System {
         };
 
         let mut running = true;
+        let mut frame_count = 1u64;
         let mut previous_time = SystemTime::now();
         while running {
             let current_time = SystemTime::now();
@@ -109,13 +110,14 @@ impl System {
             };
             previous_time = current_time;
 
-            let fps_str = format!("{:.4}ms", dt.as_secs_f32() * 1000.0);
+            let fps_str = format!("{:.4}ms {}", dt.as_secs_f32() * 1000.0, frame_count);
             let fps = font
                 .render(&fps_str)
                 .blended(Color::RGBA(0, 255, 0, 255))
                 .unwrap();
 
             running = frame(input, gfx, &fps, dt.as_secs_f32());
+            frame_count += 1;
         }
     }
 }

@@ -23,7 +23,7 @@ impl Graphics {
                 return;
             }
         };
-        let dst = Rect::new(0, 0, 96, 24);
+        let dst = Rect::new(0, 0, 120, 24);
         let result = self.canvas.copy(&texture, None, Some(dst));
         match result {
             Err(e) => eprintln!("{}", e),
