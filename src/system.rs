@@ -9,6 +9,7 @@ use std::time::SystemTime;
 
 use crate::graphics::Graphics;
 use crate::input::Input;
+use crate::world::World;
 
 pub struct System {
     sdl_context: Sdl,
@@ -81,9 +82,9 @@ impl System {
         Ok(Input::new(event_pump))
     }
 
-    pub fn run<F>(&mut self, frame: F, input: &mut Input, gfx: &mut Graphics)
+    pub fn run<F>(&mut self, frame: F, world: &mut World, input: &mut Input, gfx: &mut Graphics)
     where
-        F: Fn(&mut Input, &mut Graphics, &Surface, f32) -> bool,
+        F: Fn(&mut World, &mut Input, &mut Graphics, &Surface, f32) -> bool,
     {
         let path = Path::new(&self.system_font_path);
         let result = self.ttf_context.load_font(path, 16);
@@ -116,7 +117,7 @@ impl System {
                 .blended(Color::RGBA(0, 255, 0, 255))
                 .unwrap();
 
-            running = frame(input, gfx, &fps, dt.as_secs_f32());
+            running = frame(world, input, gfx, &fps, dt.as_secs_f32());
             frame_count += 1;
         }
     }
