@@ -60,12 +60,9 @@ fn update_world(
     gfx.begin_frame();
     gfx.set_draw_color(255, 0, 0);
     for entity in world.entities.iter() {
-        match entity.get_index_for(Component::Physics) {
-            Some(idx) => {
-                let pos = world.physics_components[idx].position;
-                gfx.draw_circle((pos.x as i32, pos.y as i32), 10);
-            }
-            None => (),
+        if let Some(idx) = entity.get_index_for(Component::Physics) {
+            let pos = world.physics_components[idx].position;
+            gfx.draw_circle((pos.x as i32, pos.y as i32), 10);
         }
     }
 

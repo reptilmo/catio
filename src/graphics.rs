@@ -25,10 +25,9 @@ impl Graphics {
         };
         let dst = Rect::new(0, 0, 120, 24);
         let result = self.canvas.copy(&texture, None, Some(dst));
-        match result {
-            Err(e) => eprintln!("{}", e),
-            Ok(_) => (),
-        };
+        if let Err(e) = result {
+            eprintln!("{}", e);
+        }
     }
 
     pub fn begin_frame(&mut self) {
