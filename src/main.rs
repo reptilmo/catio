@@ -12,32 +12,28 @@ use catiolib::system::System;
 use catiolib::vec2::Vec2;
 use catiolib::world::World;
 
-const WIDTH: u32 = 800u32;
+const WIDTH: u32 = 1200u32;
 const HEIGHT: u32 = 800u32;
 
 fn make_world() -> World {
     let mut world = World::new();
 
     // TODO:
-    let phys = Physics::new(
+    let idx = world.add_physics(Physics::new(
         Vec2::new(10.0, 100.0),
         Vec2::new(100.0, 0.0),
         Vec2::new(0.0, 0.0),
         1.0,
-    );
-    world.physics_components.push(phys);
-    let particle = EntityBuilder::default().with_physics_component(0).build();
-    world.entities.push(particle);
+    ));
+    world.add_entity(EntityBuilder::default().with_physics_component(idx).build());
 
-    let phys = Physics::new(
+    let idx = world.add_physics(Physics::new(
         Vec2::new(10.0, 150.0),
         Vec2::new(120.0, 0.0),
         Vec2::new(0.0, 0.0),
         1.0,
-    );
-    world.physics_components.push(phys);
-    let particle = EntityBuilder::default().with_physics_component(1).build();
-    world.entities.push(particle);
+    ));
+    world.add_entity(EntityBuilder::default().with_physics_component(idx).build());
 
     world
 }

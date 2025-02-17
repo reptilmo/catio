@@ -111,7 +111,7 @@ impl System {
             };
             previous_time = current_time;
 
-            let fps_str = format!("{:.4}ms {}", dt.as_secs_f32() * 1000.0, frame_count);
+            let fps_str = format!("{:.4}ms {}", dt.as_secs_f32(), frame_count);
             let fps = font
                 .render(&fps_str)
                 .blended(Color::RGBA(0, 255, 0, 255))

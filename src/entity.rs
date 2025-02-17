@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-#[derive(PartialOrd, PartialEq, Ord, Eq)]
+#[derive(Ord, Eq, PartialOrd, PartialEq)]
 pub enum Component {
     Physics,
     Render,
