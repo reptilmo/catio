@@ -16,23 +16,16 @@ const WIDTH: u32 = 1200u32;
 const HEIGHT: u32 = 800u32;
 
 fn make_world() -> World {
-    let mut world = World::new();
+    let mut world = World::new(
+        Vec2::new(10.0, 10.0),
+        Vec2::new((WIDTH - 10) as f32, (HEIGHT - 10) as f32),
+    );
 
+    let bottom = (HEIGHT - 10) as f32;
     // TODO:
-    let idx = world.add_physics(Physics::new(
-        Vec2::new(10.0, 100.0),
-        Vec2::new(100.0, 0.0),
-        Vec2::new(0.0, 0.0),
-        1.0,
-    ));
+    let idx = world.add_physics(Physics::new(Vec2::new(10.0, bottom), 1.0));
     world.add_entity(EntityBuilder::default().with_physics_component(idx).build());
-
-    let idx = world.add_physics(Physics::new(
-        Vec2::new(10.0, 150.0),
-        Vec2::new(120.0, 0.0),
-        Vec2::new(0.0, 0.0),
-        1.0,
-    ));
+    let idx = world.add_physics(Physics::new(Vec2::new(50.0, bottom), 5.0));
     world.add_entity(EntityBuilder::default().with_physics_component(idx).build());
 
     world

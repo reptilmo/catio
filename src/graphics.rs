@@ -14,6 +14,7 @@ impl Graphics {
     }
 
     pub fn copy_from_surface(&mut self, surface: &Surface) {
+        // TODO: There is a memory leak here somewhere.
         let texture_creator = self.canvas.texture_creator();
         let result = texture_creator.create_texture_from_surface(surface);
         let texture = match result {
