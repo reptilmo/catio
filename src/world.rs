@@ -88,10 +88,10 @@ impl World {
             // TODO:
             if physics.position.x <= self.upper_left.x {
                 physics.position.x = self.upper_left.x;
-                physics.velocity.x *= -1.0;
+                physics.velocity.x = 0.0;
             } else if physics.position.x >= self.lower_right.x {
                 physics.position.x = self.lower_right.x;
-                physics.velocity.x *= -1.0;
+                physics.velocity.x = 0.0;
             }
 
             if physics.position.y <= self.upper_left.y {
@@ -102,12 +102,5 @@ impl World {
                 physics.velocity.y = 0.0;
             }
         });
-    }
-
-    pub fn for_each_entity<F>(&self, process_entity: F)
-    where
-        F: Fn(&Entity),
-    {
-        self.entities.iter().for_each(process_entity);
     }
 }
