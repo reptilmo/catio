@@ -10,7 +10,7 @@ use catiolib::input::Input;
 use catiolib::physics::Physics;
 use catiolib::system::System;
 use catiolib::vec2::Vec2;
-use catiolib::world::World;
+use catiolib::world::{World, PIXELS_PER_METER};
 
 const WIDTH: u32 = 1200u32;
 const HEIGHT: u32 = 800u32;
@@ -23,10 +23,11 @@ fn make_world() -> World {
 
     let bottom = (HEIGHT - 10) as f32;
     // TODO:
-    let idx = world.add_physics(Physics::new(Vec2::new(10.0, bottom), 1.0));
+    let idx = world.add_physics(Physics::new(Vec2::new(10.0, bottom-20.0), 1.0));
     world.add_entity(EntityBuilder::default().with_physics_component(idx).build());
-    let idx = world.add_physics(Physics::new(Vec2::new(50.0, bottom), 5.0));
+    let idx = world.add_physics(Physics::new(Vec2::new(50.0, bottom-20.0), 5.0));
     world.add_entity(EntityBuilder::default().with_physics_component(idx).build());
+    world.set_player_entity(Vec2::new(100.0, bottom), 2.0);
 
     world
 }
@@ -44,6 +45,21 @@ fn update_world(
         still_running = false;
     }
 
+    if input.key_pressed(Scancode::Space) {
+        world.player_update_position(Vec2::new(0.0, -30.0) * PIXELS_PER_METER * delta_time_secs);
+        if input.key_was_pressed(Scancode::Space) {
+            world.player_update_position(Vec2::new(0.0, -30.0) * PIXELS_PER_METER * delta_time_secs);
+        }
+    }
+
+    if input.key_pressed(Scancode::Right) {
+        world.player_update_position(Vec2::new(20.0, 0.0) * PIXELS_PER_METER * delta_time_secs);
+    }
+
+    if input.key_pressed(Scancode::Left) {
+        world.player_update_position(Vec2::new(-20.0, 0.0) * PIXELS_PER_METER * delta_time_secs);
+    }
+
     world.update_physics(delta_time_secs);
 
     gfx.begin_frame();
@@ -54,7 +70,6 @@ fn update_world(
             gfx.draw_circle((pos.x as i32, pos.y as i32), 10);
         }
     }
-
     gfx.copy_from_surface(fps);
     gfx.end_frame();
     //::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
@@ -91,6 +106,5 @@ fn main() {
     };
 
     let mut world = make_world();
-
     system.run(update_world, &mut world, &mut input, &mut graphics);
 }
