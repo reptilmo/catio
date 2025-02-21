@@ -18,7 +18,8 @@ impl Graphics {
         let texture_creator = self.canvas.texture_creator();
         let result = texture_creator.create_texture_from_surface(surface);
         let texture = match result {
-            Ok(tex) => tex, Err(e) => {
+            Ok(tex) => tex,
+            Err(e) => {
                 eprintln!("{}", e);
                 return;
             }

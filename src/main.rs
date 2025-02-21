@@ -7,7 +7,7 @@ use std::time::Duration;
 use catiolib::entity::{Component, EntityBuilder};
 use catiolib::graphics::Graphics;
 use catiolib::input::Input;
-use catiolib::physics::Physics;
+use catiolib::physics::{Body, Physics};
 use catiolib::system::System;
 use catiolib::vec2::Vec2;
 use catiolib::world::{World, PIXELS_PER_METER};
@@ -23,9 +23,17 @@ fn make_world() -> World {
 
     let bottom = (HEIGHT - 10) as f32;
     // TODO:
-    let idx = world.add_physics(Physics::new(Vec2::new(10.0, bottom-20.0), 1.0));
+    let idx = world.add_physics(Physics::new(
+        Body::make_circle(10.0),
+        Vec2::new(10.0, bottom - 20.0),
+        1.0,
+    ));
     world.add_entity(EntityBuilder::default().with_physics_component(idx).build());
-    let idx = world.add_physics(Physics::new(Vec2::new(50.0, bottom-20.0), 5.0));
+    let idx = world.add_physics(Physics::new(
+        Body::Circle { radius: 10.0 },
+        Vec2::new(50.0, bottom - 20.0),
+        5.0,
+    ));
     world.add_entity(EntityBuilder::default().with_physics_component(idx).build());
     world.set_player_entity(Vec2::new(100.0, bottom), 2.0);
 
@@ -45,11 +53,13 @@ fn update_world(
         still_running = false;
     }
 
-    if input.key_pressed(Scancode::Space) {
+    if input.key_pressed(Scancode::Space) && input.key_was_pressed(Scancode::Space) {
         world.player_update_position(Vec2::new(0.0, -30.0) * PIXELS_PER_METER * delta_time_secs);
-        if input.key_was_pressed(Scancode::Space) {
-            world.player_update_position(Vec2::new(0.0, -30.0) * PIXELS_PER_METER * delta_time_secs);
-        }
+
+        //if input.key_was_pressed(Scancode::Space) {
+        //    world.player_update_position(
+        //        Vec2::new(0.0, -30.0) * PIXELS_PER_METER * delta_time_secs);
+        //}
     }
 
     if input.key_pressed(Scancode::Right) {

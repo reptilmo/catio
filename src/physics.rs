@@ -1,19 +1,59 @@
 use crate::vec2::Vec2;
 
+pub enum Body {
+    Circle { radius: f32 },
+    Polygon { verts: Vec<Vec2> },
+}
+
+impl Body {
+    pub fn make_circle(radius: f32) -> Self {
+        Body::Circle { radius }
+    }
+
+    pub fn make_polygon(verts: Vec<Vec2>) -> Self {
+        Body::Polygon { verts }
+    }
+
+    pub fn moment(&self) -> f32 {
+        match self {
+            Body::Circle { radius } => *radius,
+            _ => 0.0,
+        }
+    }
+}
+
 pub struct Physics {
     pub position: Vec2,
     pub velocity: Vec2,
     pub forces: Vec2,
-    pub mass: f32, // TODO: only need inverse?
+    pub inverse_mass: f32,
+    pub body: Body,
+}
+
+pub struct Force {}
+
+impl Force {
+    pub fn friction() -> Vec2 {
+        Vec2::new(0.0, 0.0)
+    }
+
+    pub fn drag() -> Vec2 {
+        Vec2::new(0.0, 0.0)
+    }
+
+    pub fn spring() -> Vec2 {
+        Vec2::new(0.0, 0.0)
+    }
 }
 
 impl Physics {
-    pub fn new(position: Vec2, mass: f32) -> Self {
+    pub fn new(body: Body, position: Vec2, mass: f32) -> Self {
         Self {
             position,
             velocity: Vec2::new(0.0, 0.0),
             forces: Vec2::new(0.0, 0.0),
-            mass,
+            inverse_mass: 1.0 / mass,
+            body,
         }
     }
 
@@ -21,8 +61,12 @@ impl Physics {
         self.forces += force;
     }
 
+    pub fn apply_impulse(&mut self, impulse: Vec2) {
+        self.velocity += impulse * self.inverse_mass;
+    }
+
     pub fn integrate(&mut self, dt: f32) {
-        let acceleration = self.forces / self.mass;
+        let acceleration = self.forces * self.inverse_mass;
         self.velocity += acceleration * dt;
         self.position += self.velocity * dt;
         self.forces = Vec2::new(0.0, 0.0);

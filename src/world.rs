@@ -1,5 +1,5 @@
 use crate::entity::{Component, Entity, EntityBuilder};
-use crate::physics::Physics;
+use crate::physics::{Body, Physics};
 use crate::vec2::Vec2;
 
 pub const PIXELS_PER_METER: f32 = 10.0;
@@ -42,7 +42,7 @@ impl World {
     }
 
     pub fn set_player_entity(&mut self, pos: Vec2, mass: f32) {
-        let phys_idx = self.add_physics(Physics::new(pos, mass));
+        let phys_idx = self.add_physics(Physics::new(Body::Circle { radius: 20.0 }, pos, mass));
         self.player_entity_idx = Some(
             self.add_entity(
                 EntityBuilder::default()
@@ -77,7 +77,7 @@ impl World {
 
         // TODO:
         self.physics_components.iter_mut().for_each(|physics| {
-            let weight = gravity * physics.mass;
+            let weight = gravity * physics.inverse_mass;
             physics.apply_force(weight);
             physics.apply_force(force);
             physics.integrate(delta_time_seconds);
