@@ -1,5 +1,5 @@
 use crate::entity::{Component, Entity, EntityBuilder};
-use crate::physics::{Body, Physics};
+use crate::physics::{Body, Force, Physics};
 use crate::vec2::Vec2;
 
 pub const PIXELS_PER_METER: f32 = 10.0;
@@ -37,10 +37,6 @@ impl World {
         self.entities.len() - 1
     }
 
-    pub fn player_add_input_force(&mut self, force: Vec2) {
-        self.player_input_forces.push(force);
-    }
-
     pub fn set_player_entity(&mut self, pos: Vec2, mass: f32) {
         let phys_idx = self.add_physics(Physics::new(Body::Circle { radius: 20.0 }, pos, mass));
         self.player_entity_idx = Some(
@@ -52,10 +48,10 @@ impl World {
         );
     }
 
-    pub fn player_update_position(&mut self, step: Vec2) {
+    pub fn player_impulse(&mut self, impulse: Vec2) {
         if let Some(player_idx) = self.player_entity_idx {
             if let Some(phys_idx) = self.entities[player_idx].get_index_for(Component::Physics) {
-                self.physics_components[phys_idx].position += step;
+                self.physics_components[phys_idx].apply_impulse(impulse);
             }
         }
     }
@@ -79,7 +75,9 @@ impl World {
         self.physics_components.iter_mut().for_each(|physics| {
             let weight = gravity * physics.inverse_mass;
             physics.apply_force(weight);
-            physics.apply_force(force);
+            physics.apply_force(Force::drag(0.001, physics.velocity));
+            //physics.apply_force(Force::friction(0.65, physics.velocity));
+            //physics.apply_force(force);
             physics.integrate(delta_time_seconds);
             // TODO:
             if physics.velocity.y < -30.0 {

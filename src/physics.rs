@@ -33,12 +33,12 @@ pub struct Physics {
 pub struct Force {}
 
 impl Force {
-    pub fn friction() -> Vec2 {
-        Vec2::new(0.0, 0.0)
+    pub fn friction(k: f32, velocity: Vec2) -> Vec2 {
+        -velocity * k
     }
 
-    pub fn drag() -> Vec2 {
-        Vec2::new(0.0, 0.0)
+    pub fn drag(k: f32, velocity: Vec2) -> Vec2 {
+        -velocity * velocity.magnitude2() * k
     }
 
     pub fn spring() -> Vec2 {
