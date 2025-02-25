@@ -41,7 +41,7 @@ impl Force {
         -velocity * velocity.magnitude2() * k
     }
 
-    pub fn spring() -> Vec2 {
+    pub fn spring(k: f32, object_position: Vec2, anchor_position: Vec2) -> Vec2 {
         Vec2::new(0.0, 0.0)
     }
 }

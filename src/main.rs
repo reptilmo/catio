@@ -53,10 +53,8 @@ fn update_world(
         still_running = false;
     }
 
-    if input.key_pressed(Scancode::Space)
-    /*&& !input.key_was_pressed(Scancode::Space)*/
-    {
-        world.player_impulse(Vec2::new(0.0, -100.0) * PIXELS_PER_METER);
+    if input.key_pressed(Scancode::Space) && !input.key_was_pressed(Scancode::Space) {
+        world.player_impulse(Vec2::new(0.0, -50000000.0) * PIXELS_PER_METER);
 
         //if input.key_was_pressed(Scancode::Space) {
         //    world.player_update_position(
@@ -65,17 +63,24 @@ fn update_world(
     }
 
     if input.key_pressed(Scancode::Right) {
-        world.player_impulse(Vec2::new(0.5, 0.0) * PIXELS_PER_METER);
+        world.player_impulse(Vec2::new(1.5, 0.0) * PIXELS_PER_METER);
     }
 
     if input.key_pressed(Scancode::Left) {
-        world.player_impulse(Vec2::new(-0.5, 0.0) * PIXELS_PER_METER);
+        world.player_impulse(Vec2::new(-1.5, 0.0) * PIXELS_PER_METER);
     }
 
     world.update_physics(delta_time_secs);
 
     gfx.begin_frame();
     gfx.set_draw_color(255, 0, 0);
+    if let Some(player) = &world.player_entity {
+        if let Some(idx) = player.get_index_for(Component::Physics) {
+            let pos = world.physics_components[idx].position;
+            gfx.draw_circle((pos.x as i32, pos.y as i32), 15);
+        }
+    }
+
     for entity in world.entities.iter() {
         if let Some(idx) = entity.get_index_for(Component::Physics) {
             let pos = world.physics_components[idx].position;

@@ -10,8 +10,7 @@ pub struct World {
     pub physics_components: Vec<Physics>,
     //render_components: Vec<Render>,
     pub entities: Vec<Entity>,
-    pub player_input_forces: Vec<Vec2>,
-    player_entity_idx: Option<usize>,
+    pub player_entity: Option<Entity>,
 }
 
 impl World {
@@ -22,8 +21,7 @@ impl World {
             physics_components: Vec::<Physics>::default(),
             //render_components: Vec::<Render>::default(),
             entities: Vec::<Entity>::default(),
-            player_input_forces: Vec::<Vec2>::default(),
-            player_entity_idx: None,
+            player_entity: None,
         }
     }
 
@@ -39,18 +37,16 @@ impl World {
 
     pub fn set_player_entity(&mut self, pos: Vec2, mass: f32) {
         let phys_idx = self.add_physics(Physics::new(Body::Circle { radius: 20.0 }, pos, mass));
-        self.player_entity_idx = Some(
-            self.add_entity(
-                EntityBuilder::default()
-                    .with_physics_component(phys_idx)
-                    .build(),
-            ),
+        self.player_entity = Some(
+            EntityBuilder::default()
+                .with_physics_component(phys_idx)
+                .build(),
         );
     }
 
     pub fn player_impulse(&mut self, impulse: Vec2) {
-        if let Some(player_idx) = self.player_entity_idx {
-            if let Some(phys_idx) = self.entities[player_idx].get_index_for(Component::Physics) {
+        if let Some(player) = &self.player_entity {
+            if let Some(phys_idx) = player.get_index_for(Component::Physics) {
                 self.physics_components[phys_idx].apply_impulse(impulse);
             }
         }
@@ -58,31 +54,17 @@ impl World {
 
     pub fn update_physics(&mut self, delta_time_seconds: f32) {
         // TODO:
-        let gravity = Vec2::new(0.0, 98.1) * PIXELS_PER_METER;
+        let gravity = Vec2::new(0.0, 0.00981) * PIXELS_PER_METER;
         let force = Vec2::new(2.0, 0.0) * PIXELS_PER_METER;
-
-        // TODO: Controlable entity stuff.
-        if let Some(player_idx) = self.player_entity_idx {
-            if let Some(phys_idx) = self.entities[player_idx].get_index_for(Component::Physics) {
-                for force in &self.player_input_forces {
-                    self.physics_components[phys_idx].apply_force(*force);
-                }
-            }
-        }
-        self.player_input_forces.clear();
 
         // TODO:
         self.physics_components.iter_mut().for_each(|physics| {
-            let weight = gravity * physics.inverse_mass;
+            let weight = gravity / physics.inverse_mass;
             physics.apply_force(weight);
             physics.apply_force(Force::drag(0.001, physics.velocity));
             //physics.apply_force(Force::friction(0.65, physics.velocity));
             //physics.apply_force(force);
             physics.integrate(delta_time_seconds);
-            // TODO:
-            if physics.velocity.y < -30.0 {
-                physics.velocity.y = -30.0;
-            }
             // TODO:
             if physics.position.x <= self.upper_left.x {
                 physics.position.x = self.upper_left.x;

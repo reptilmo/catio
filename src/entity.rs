@@ -6,8 +6,16 @@ pub enum Component {
     Render,
 }
 
+#[derive(PartialEq)]
+pub enum State {
+    Idle,
+    Walking,
+    Jumping,
+}
+
 pub struct Entity {
     component_idx: BTreeMap<Component, usize>,
+    current_state: State,
 }
 
 #[derive(Default)]
@@ -25,6 +33,16 @@ impl Entity {
             None => None,
             Some(idx) => Some(*idx),
         }
+    }
+
+    pub fn update_state(&mut self, state: State) -> bool {
+        // TODO:
+        if self.current_state == State::Jumping && state == State::Jumping {
+            return false;
+        }
+
+        self.current_state = state;
+        true
     }
 }
 
@@ -48,6 +66,7 @@ impl EntityBuilder {
     pub fn build(self) -> Entity {
         Entity {
             component_idx: self.component_idx,
+            current_state: State::Idle, // TODO: A new entity is always idle.
         }
     }
 }
