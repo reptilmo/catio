@@ -1,8 +1,10 @@
-use crate::entity::{Component, Entity, EntityBuilder};
-use crate::physics::{Body, Force, Physics};
-use crate::vec2::Vec2;
+use catphys::force::Force;
+use catphys::physics::Physics;
+use catphys::vec2::Vec2;
 
-pub const PIXELS_PER_METER: f32 = 10.0;
+use crate::entity::{Component, Entity, EntityBuilder};
+
+pub const PIXELS_PER_METER: f32 = 100.0;
 
 pub struct World {
     upper_left: Vec2,
@@ -36,7 +38,7 @@ impl World {
     }
 
     pub fn set_player_entity(&mut self, pos: Vec2, mass: f32) {
-        let phys_idx = self.add_physics(Physics::new(Body::Circle { radius: 20.0 }, pos, mass));
+        let phys_idx = self.add_physics(Physics::new(pos, mass));
         self.player_entity = Some(
             EntityBuilder::default()
                 .with_physics_component(phys_idx)
@@ -54,8 +56,8 @@ impl World {
 
     pub fn update_physics(&mut self, delta_time_seconds: f32) {
         // TODO:
-        let gravity = Vec2::new(0.0, 0.00981) * PIXELS_PER_METER;
-        let force = Vec2::new(2.0, 0.0) * PIXELS_PER_METER;
+        let gravity = Vec2::new(0.0, 9.81) * PIXELS_PER_METER;
+        let _force = Vec2::new(2.0, 0.0) * PIXELS_PER_METER;
 
         // TODO:
         self.physics_components.iter_mut().for_each(|physics| {

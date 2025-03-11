@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "catiolib"
-path = "src/lib.rs"
+name = "catphys"
+path = "src/catphys/lib.rs"
 
 [[bin]]
 name = "catio"
