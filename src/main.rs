@@ -1,6 +1,7 @@
 extern crate sdl2;
 
 use sdl2::keyboard::Scancode;
+use sdl2::mouse::MouseButton;
 use sdl2::surface::Surface;
 use std::time::Duration;
 
@@ -33,7 +34,6 @@ fn make_world() -> World {
     world.add_entity(EntityBuilder::default().with_physics_component(idx).build());
     let idx = world.add_physics(Physics::new(Vec2::new(50.0, bottom - 200.0), 5.0));
     world.add_entity(EntityBuilder::default().with_physics_component(idx).build());
-    world.set_player_entity(Vec2::new(100.0, bottom), 1.0);
 
     world
 }
@@ -51,34 +51,14 @@ fn update_world(
         still_running = false;
     }
 
-    if input.key_pressed(Scancode::Space) && !input.key_was_pressed(Scancode::Space) {
-        world.player_impulse(Vec2::new(0.0, -50000000.0) * PIXELS_PER_METER);
-
-        //if input.key_was_pressed(Scancode::Space) {
-        //    world.player_update_position(
-        //        Vec2::new(0.0, -30.0) * PIXELS_PER_METER * delta_time_secs);
-        //}
-    }
-
-    if input.key_pressed(Scancode::Right) {
-        world.player_impulse(Vec2::new(1.5, 0.0) * PIXELS_PER_METER);
-    }
-
-    if input.key_pressed(Scancode::Left) {
-        world.player_impulse(Vec2::new(-1.5, 0.0) * PIXELS_PER_METER);
+    if input.mouse_pressed(MouseButton::Left) && !input.mouse_was_pressed(MouseButton::Left) {
+        world.spawn_ball(input.mouse_position());
     }
 
     world.update_physics(delta_time_secs);
 
     gfx.begin_frame();
     gfx.set_draw_color(255, 0, 0);
-    if let Some(player) = &world.player_entity {
-        if let Some(idx) = player.get_index_for(Component::Physics) {
-            let pos = world.physics_components[idx].position;
-            gfx.draw_circle((pos.x as i32, pos.y as i32), 15);
-        }
-    }
-
     for entity in world.entities.iter() {
         if let Some(idx) = entity.get_index_for(Component::Physics) {
             let pos = world.physics_components[idx].position;

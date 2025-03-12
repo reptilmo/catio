@@ -12,7 +12,6 @@ pub struct World {
     pub physics_components: Vec<Physics>,
     //render_components: Vec<Render>,
     pub entities: Vec<Entity>,
-    pub player_entity: Option<Entity>,
 }
 
 impl World {
@@ -23,7 +22,6 @@ impl World {
             physics_components: Vec::<Physics>::default(),
             //render_components: Vec::<Render>::default(),
             entities: Vec::<Entity>::default(),
-            player_entity: None,
         }
     }
 
@@ -37,21 +35,9 @@ impl World {
         self.entities.len() - 1
     }
 
-    pub fn set_player_entity(&mut self, pos: Vec2, mass: f32) {
-        let phys_idx = self.add_physics(Physics::new(pos, mass));
-        self.player_entity = Some(
-            EntityBuilder::default()
-                .with_physics_component(phys_idx)
-                .build(),
-        );
-    }
-
-    pub fn player_impulse(&mut self, impulse: Vec2) {
-        if let Some(player) = &self.player_entity {
-            if let Some(phys_idx) = player.get_index_for(Component::Physics) {
-                self.physics_components[phys_idx].apply_impulse(impulse);
-            }
-        }
+    pub fn spawn_ball(&mut self, pos: (i32, i32)) {
+        let idx = self.add_physics(Physics::new(Vec2::new(pos.0 as f32, pos.1 as f32), 5.0));
+        self.add_entity(EntityBuilder::default().with_physics_component(idx).build());
     }
 
     pub fn update_physics(&mut self, delta_time_seconds: f32) {
