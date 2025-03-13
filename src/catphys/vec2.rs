@@ -56,6 +56,13 @@ impl Vec2 {
         // direction (self) is pointing in, normal is pointing out
         *self - (normal * 2.0 * self.dot(normal))
     }
+
+    pub fn rotate(&self, rads: f32) -> Vec2 {
+        Vec2 {
+            x: self.x * rads.cos() - self.y * rads.sin(),
+            y: self.x * rads.sin() + self.y * rads.cos(),
+        }
+    }
 }
 
 impl cmp::PartialEq for Vec2 {
@@ -177,5 +184,16 @@ mod tests {
         let a = Vec2::new(1.0, 2.0);
         let b = Vec2::new(0.5, 1.0);
         assert_eq!(a / 2.0, b);
+    }
+
+    #[test]
+    fn rotate() {
+        let a = Vec2::new(1.0, 0.0);
+        let b = a.rotate(std::f32::consts::PI);
+        assert_eq!(b.x, -1.0);
+        assert!(b.y.abs() <= std::f32::EPSILON); // Rust has nothing for this :/
+        let c = a.rotate(std::f32::consts::PI * 0.5);
+        assert!(c.x.abs() <= std::f32::EPSILON);
+        assert_eq!(c.y, 1.0);
     }
 }
