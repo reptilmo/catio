@@ -8,6 +8,10 @@ pub struct Graphics {
     canvas: WindowCanvas,
 }
 
+pub struct Render {
+    pub color: Color,
+}
+
 impl Graphics {
     pub fn new(canvas: WindowCanvas) -> Self {
         Self { canvas }
@@ -40,8 +44,8 @@ impl Graphics {
         self.canvas.present();
     }
 
-    pub fn set_draw_color(&mut self, r: u8, g: u8, b: u8) {
-        self.canvas.set_draw_color(Color::RGB(r, g, b));
+    pub fn set_draw_color(&mut self, c: Color) {
+        self.canvas.set_draw_color(c);
     }
 
     pub fn draw_horizontal_line(&mut self, x_min: i32, x_max: i32, y: i32) {

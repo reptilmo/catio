@@ -1,9 +1,9 @@
 pub mod force;
 pub mod physics;
+pub mod shape;
 pub mod vec2;
-//pub mod shape;
-//
 
 pub use crate::force::Force;
 pub use crate::physics::Physics;
+pub use crate::shape::Shape;
 pub use crate::vec2::Vec2;

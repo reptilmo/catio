@@ -3,6 +3,7 @@ use std::collections::BTreeMap;
 #[derive(Ord, Eq, PartialOrd, PartialEq)]
 pub enum Component {
     Physics,
+    Shape,
     Render,
 }
 
@@ -63,10 +64,16 @@ impl EntityBuilder {
         self
     }
 
+    pub fn with_shape_component(mut self, idx: usize) -> Self {
+        self.component_idx.insert(Component::Shape, idx);
+        self
+    }
+
     pub fn build(self) -> Entity {
         Entity {
             component_idx: self.component_idx,
-            current_state: State::Idle, // TODO: A new entity is always idle.
+            // A new entity is always idle.
+            current_state: State::Idle,
         }
     }
 }

@@ -17,8 +17,8 @@ pub struct Physics {
 }
 
 impl Physics {
-    pub fn new(position: Vec2, mass: f32) -> Self {
-        let angular_mass: f32 = 1.0; // TODO: Depends on the shape.
+    pub fn new(position: Vec2, mass: f32, rotational_inertia: f32) -> Self {
+        let angular_mass = rotational_inertia * mass;
 
         Self {
             position,

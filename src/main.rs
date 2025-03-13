@@ -16,24 +16,16 @@ use crate::graphics::Graphics;
 use crate::input::Input;
 use crate::system::System;
 use crate::world::{World, PIXELS_PER_METER};
-use catphys::Physics;
-use catphys::Vec2;
+use catphys::{Shape, Vec2};
 
 const WIDTH: u32 = 1200u32;
 const HEIGHT: u32 = 800u32;
 
 fn make_world() -> World {
-    let mut world = World::new(
+    let world = World::new(
         Vec2::new(10.0, 10.0),
         Vec2::new((WIDTH - 10) as f32, (HEIGHT - 10) as f32),
     );
-
-    let bottom = (HEIGHT - 10) as f32;
-    // TODO:
-    let idx = world.add_physics(Physics::new(Vec2::new(10.0, bottom - 200.0), 5.0));
-    world.add_entity(EntityBuilder::default().with_physics_component(idx).build());
-    let idx = world.add_physics(Physics::new(Vec2::new(50.0, bottom - 200.0), 5.0));
-    world.add_entity(EntityBuilder::default().with_physics_component(idx).build());
 
     world
 }
@@ -58,11 +50,23 @@ fn update_world(
     world.update_physics(delta_time_secs);
 
     gfx.begin_frame();
-    gfx.set_draw_color(255, 0, 0);
     for entity in world.entities.iter() {
-        if let Some(idx) = entity.get_index_for(Component::Physics) {
-            let pos = world.physics_components[idx].position;
-            gfx.draw_circle((pos.x as i32, pos.y as i32), 10);
+        if let Some(idx) = entity.get_index_for(Component::Render) {
+            let color = world.render_components[idx].color;
+            if let Some(idx) = entity.get_index_for(Component::Physics) {
+                let pos = world.physics_components[idx].position;
+                if let Some(idx) = entity.get_index_for(Component::Shape) {
+                    let shape = &world.shape_components[idx];
+                    gfx.set_draw_color(color);
+                    match shape {
+                        Shape::Circle { radius } => gfx.draw_circle(
+                            (pos.x as i32, pos.y as i32),
+                            (radius * PIXELS_PER_METER) as i32,
+                        ),
+                        _ => (),
+                    }
+                }
+            }
         }
     }
     gfx.copy_from_surface(fps);

@@ -53,7 +53,7 @@ impl Vec2 {
 
     #[inline]
     pub fn reflect(&self, normal: Vec2) -> Vec2 {
-        // dirtection (self) is pointing in, normal is pointing out
+        // direction (self) is pointing in, normal is pointing out
         *self - (normal * 2.0 * self.dot(normal))
     }
 }
