@@ -12,8 +12,6 @@ pub struct Physics {
     pub torque: f32,
     pub angular_mass: f32,
     pub inverse_angular_mass: f32,
-
-    pub shape_idx: i32,
 }
 
 impl Physics {
@@ -31,7 +29,6 @@ impl Physics {
             torque: 0.0,
             angular_mass,
             inverse_angular_mass: 1.0 / angular_mass,
-            shape_idx: -1,
         }
     }
 
