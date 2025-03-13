@@ -1,3 +1,4 @@
+use catphys::Vec2;
 use sdl2::pixels::Color;
 use sdl2::rect::Point;
 use sdl2::rect::Rect;
@@ -60,7 +61,7 @@ impl Graphics {
         }
     }
 
-    pub fn draw_box(&mut self, upper_left: (i32, i32), lower_right: (i32, i32)) {
+    pub fn draw_rect(&mut self, upper_left: (i32, i32), lower_right: (i32, i32)) {
         let (x0, y0) = upper_left;
         let (x1, y1) = lower_right;
 
@@ -77,5 +78,21 @@ impl Graphics {
             let y: i32 = (f32::sqrt((r2 - x * x) as f32) + 0.5) as i32;
             self.draw_vertical_line(ox + x, oy - y, oy + y);
         }
+    }
+
+    pub fn draw_box(&mut self, origin: Vec2, width: f32, height: f32, rotation: f32) {
+        let mut v0 = Vec2::new(width * -0.5, height * -0.5).rotate(rotation);
+        let mut v1 = Vec2::new(width * 0.5, height * -0.5).rotate(rotation);
+        let mut v2 = Vec2::new(width * 0.5, height * 0.5).rotate(rotation);
+        let mut v3 = Vec2::new(width * -0.5, height * 0.5).rotate(rotation);
+
+        v0 += origin;
+        v1 += origin;
+        v2 += origin;
+        v3 += origin;
+
+        // TODO:
+        // Filled triangles or draw lines!
+        self.draw_rect((v0.x as i32, v0.y as i32), (v2.x as i32, v2.y as i32));
     }
 }

@@ -45,6 +45,10 @@ fn update_world(
 
     if input.mouse_pressed(MouseButton::Left) && !input.mouse_was_pressed(MouseButton::Left) {
         world.spawn_ball(input.mouse_position());
+    } else if input.mouse_pressed(MouseButton::Right)
+        && !input.mouse_was_pressed(MouseButton::Right)
+    {
+        world.spawn_box(input.mouse_position());
     }
 
     world.update_physics(delta_time_secs);
@@ -55,6 +59,7 @@ fn update_world(
             let color = world.render_components[idx].color;
             if let Some(idx) = entity.get_index_for(Component::Physics) {
                 let pos = world.physics_components[idx].position;
+                let rotation = world.physics_components[idx].rotation;
                 if let Some(idx) = entity.get_index_for(Component::Shape) {
                     let shape = &world.shape_components[idx];
                     gfx.set_draw_color(color);
@@ -63,6 +68,9 @@ fn update_world(
                             (pos.x as i32, pos.y as i32),
                             (radius * PIXELS_PER_METER) as i32,
                         ),
+                        Shape::Rectangle { w, h } => {
+                            gfx.draw_box(pos, w * PIXELS_PER_METER, h * PIXELS_PER_METER, rotation)
+                        }
                         _ => (),
                     }
                 }

@@ -50,7 +50,8 @@ impl World {
         let render = Render {
             color: Color::RGB(255, 0, 0),
         };
-        let rend_idx = self.add_render(render); //TODO:
+        let rend_idx = self.add_render(render); //TODO: Only need one render component if the balls
+                                                //all look the same.
         let ball = Shape::Circle { radius: 0.1 };
         let phys_idx = self.add_physics(Physics::new(
             Vec2::new(pos.0 as f32, pos.1 as f32),
@@ -67,10 +68,31 @@ impl World {
         );
     }
 
+    pub fn spawn_box(&mut self, pos: (i32, i32)) {
+        let render = Render {
+            color: Color::RGB(0, 0, 255),
+        };
+        let rend_idx = self.add_render(render); //TODO: As above.
+        let rect = Shape::Rectangle { w: 0.2, h: 0.2 };
+        let phys_idx = self.add_physics(Physics::new(
+            Vec2::new(pos.0 as f32, pos.1 as f32),
+            10.0,
+            rect.rotational_inertia(),
+        ));
+        let shape_idx = self.add_shape(rect);
+        self.add_entity(
+            EntityBuilder::default()
+                .with_shape_component(shape_idx)
+                .with_physics_component(phys_idx)
+                .with_render_component(rend_idx)
+                .build(),
+        );
+    }
+
     pub fn update_physics(&mut self, delta_time_seconds: f32) {
         // TODO:
         let gravity = Vec2::new(0.0, 9.81) * PIXELS_PER_METER;
-        let _wind = Vec2::new(1.5, 0.0) * PIXELS_PER_METER;
+        let wind = Vec2::new(5.0, 0.0) * PIXELS_PER_METER;
 
         // TODO:
         self.physics_components.iter_mut().for_each(|physics| {
@@ -78,7 +100,7 @@ impl World {
             physics.apply_force(weight);
             physics.apply_force(Force::drag(0.001, physics.velocity));
             //physics.apply_force(Force::friction(0.65, physics.velocity));
-            //physics.apply_force(wind);
+            physics.apply_force(wind);
             physics.integrate(delta_time_seconds);
             // TODO:
             if physics.position.x <= self.upper_left.x {
