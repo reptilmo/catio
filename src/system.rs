@@ -21,22 +21,14 @@ pub struct System {
 impl System {
     pub fn init(font_path: String) -> Result<Self, String> {
         let result = sdl2::init();
-        let context = match result {
-            Ok(sdl) => sdl,
-            Err(e) => return Err(e),
-        };
-
+        let context = result?;
         let result = sdl2::ttf::init();
         let ttf = match result {
             Ok(ctx) => ctx,
             Err(e) => return Err(e.to_string()),
         };
-
         let result = context.video();
-        let video_sys = match result {
-            Ok(video) => video,
-            Err(e) => return Err(e),
-        };
+        let video_sys = result?;
 
         Ok(Self {
             sdl_context: context,
@@ -74,10 +66,7 @@ impl System {
 
     pub fn init_input(&self) -> Result<Input, String> {
         let result = self.sdl_context.event_pump();
-        let event_pump = match result {
-            Ok(pump) => pump,
-            Err(e) => return Err(e),
-        };
+        let event_pump = result?;
 
         Ok(Input::new(event_pump))
     }

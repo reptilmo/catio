@@ -49,6 +49,7 @@ impl World {
     pub fn spawn_ball(&mut self, pos: (i32, i32)) {
         let render = Render {
             color: Color::RGB(255, 0, 0),
+            fill: true,
         };
         let rend_idx = self.add_render(render); //TODO: Only need one render component if the balls
                                                 //all look the same.
@@ -70,7 +71,8 @@ impl World {
 
     pub fn spawn_box(&mut self, pos: (i32, i32)) {
         let render = Render {
-            color: Color::RGB(0, 0, 255),
+            color: Color::RGB(50, 50, 255),
+            fill: false,
         };
         let rend_idx = self.add_render(render); //TODO: As above.
         let rect = Shape::Rectangle { w: 0.2, h: 0.2 };
@@ -92,16 +94,19 @@ impl World {
     pub fn update_physics(&mut self, delta_time_seconds: f32) {
         // TODO:
         let gravity = Vec2::new(0.0, 9.81) * PIXELS_PER_METER;
-        let wind = Vec2::new(5.0, 0.0) * PIXELS_PER_METER;
+        let _wind = Vec2::new(5.0, 0.0) * PIXELS_PER_METER;
+        let torque = 0.001;
 
         // TODO:
         self.physics_components.iter_mut().for_each(|physics| {
             let weight = gravity / physics.inverse_mass;
             physics.apply_force(weight);
+            physics.apply_torque(torque);
             physics.apply_force(Force::drag(0.001, physics.velocity));
             //physics.apply_force(Force::friction(0.65, physics.velocity));
-            physics.apply_force(wind);
+            //physics.apply_force(wind);
             physics.integrate(delta_time_seconds);
+            physics.integrate_angular(delta_time_seconds);
             // TODO:
             if physics.position.x <= self.upper_left.x {
                 physics.position.x = self.upper_left.x;
@@ -116,7 +121,7 @@ impl World {
                 physics.velocity.y = 0.0;
             } else if physics.position.y >= self.lower_right.y {
                 physics.position.y = self.lower_right.y;
-                physics.velocity.y = 0.0;
+                physics.velocity.y *= -0.7;
             }
         });
     }

@@ -30,10 +30,7 @@ impl Entity {
     }
 
     pub fn get_index_for(&self, comp: Component) -> Option<usize> {
-        match self.component_idx.get(&comp) {
-            None => None,
-            Some(idx) => Some(*idx),
-        }
+        self.component_idx.get(&comp).copied()
     }
 
     pub fn update_state(&mut self, state: State) -> bool {

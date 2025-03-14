@@ -11,6 +11,7 @@ pub struct Graphics {
 
 pub struct Render {
     pub color: Color,
+    pub fill: bool,
 }
 
 impl Graphics {
@@ -37,7 +38,7 @@ impl Graphics {
     }
 
     pub fn begin_frame(&mut self) {
-        self.canvas.set_draw_color(Color::RGB(40, 40, 40));
+        self.canvas.set_draw_color(Color::RGB(50, 50, 50));
         self.canvas.clear();
     }
 
@@ -58,6 +59,38 @@ impl Graphics {
     pub fn draw_vertical_line(&mut self, x: i32, y_min: i32, y_max: i32) {
         for y in y_min..y_max {
             self.canvas.draw_point(Point::new(x, y)).unwrap();
+        }
+    }
+
+    pub fn draw_line(&mut self, x0: i32, y0: i32, x1: i32, y1: i32) {
+        let mut x0 = x0;
+        let mut y0 = y0;
+
+        let dx = (x1 - x0).abs();
+        let dy = -(y1 - y0).abs();
+        let mut error = dx + dy;
+
+        let sx = if x0 < x1 { 1 } else { -1 };
+        let sy = if y0 < y1 { 1 } else { -1 };
+
+        loop {
+            self.canvas.draw_point(Point::new(x0, y0)).unwrap();
+            let e2 = 2 * error;
+            if e2 >= dy {
+                if x0 == x1 {
+                    break;
+                }
+                error += dy;
+                x0 += sx;
+            }
+
+            if e2 <= dx {
+                if y0 == y1 {
+                    break;
+                }
+                error += dx;
+                y0 += sy;
+            }
         }
     }
 
@@ -93,6 +126,9 @@ impl Graphics {
 
         // TODO:
         // Filled triangles or draw lines!
-        self.draw_rect((v0.x as i32, v0.y as i32), (v2.x as i32, v2.y as i32));
+        self.draw_line(v0.x as i32, v0.y as i32, v1.x as i32, v1.y as i32);
+        self.draw_line(v1.x as i32, v1.y as i32, v2.x as i32, v2.y as i32);
+        self.draw_line(v2.x as i32, v2.y as i32, v3.x as i32, v3.y as i32);
+        self.draw_line(v3.x as i32, v3.y as i32, v0.x as i32, v0.y as i32);
     }
 }
