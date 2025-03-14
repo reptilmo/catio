@@ -1,8 +1,8 @@
 extern crate sdl2;
 
 use sdl2::keyboard::Scancode;
-use sdl2::pixels::Color;
 use sdl2::mouse::MouseButton;
+use sdl2::pixels::Color;
 use sdl2::surface::Surface;
 use std::time::Duration;
 
@@ -16,7 +16,7 @@ use crate::entity::{Component, EntityBuilder};
 use crate::graphics::Graphics;
 use crate::input::Input;
 use crate::system::System;
-use crate::world::{World, PIXELS_PER_METER};
+use crate::world::World;
 use catphys::{Shape, Vec2};
 
 const WIDTH: u32 = 1200u32;
@@ -69,13 +69,10 @@ fn update_world(
                         gfx.set_draw_color(color);
                     }
                     match shape {
-                        Shape::Circle { radius } => gfx.draw_circle(
-                            (pos.x as i32, pos.y as i32),
-                            (radius * PIXELS_PER_METER) as i32,
-                        ),
-                        Shape::Rectangle { w, h } => {
-                            gfx.draw_box(pos, w * PIXELS_PER_METER, h * PIXELS_PER_METER, rotation)
+                        Shape::Circle { radius } => {
+                            gfx.draw_circle((pos.x as i32, pos.y as i32), *radius as i32)
                         }
+                        Shape::Rectangle { w, h } => gfx.draw_box(pos, *w, *h, rotation),
                         _ => (),
                     }
                 }

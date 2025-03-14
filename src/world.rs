@@ -1,6 +1,6 @@
 use crate::entity::{Component, Entity, EntityBuilder};
 use crate::graphics::Render;
-use catphys::{Collision, Force, Physics, Shape, Vec2};
+use catphys::{collision_test, Collision, Force, Physics, Shape, Vec2};
 use sdl2::pixels::Color;
 
 pub const PIXELS_PER_METER: f32 = 100.0;
@@ -8,6 +8,11 @@ pub const PIXELS_PER_METER: f32 = 100.0;
 pub struct World {
     upper_left: Vec2,
     lower_right: Vec2,
+
+    // Environment and world forces.
+    gravitational_acceleration: Vec2,
+
+    // Entity component.
     pub physics_components: Vec<Physics>,
     pub shape_components: Vec<Shape>,
     pub render_components: Vec<Render>,
@@ -19,6 +24,7 @@ impl World {
         Self {
             upper_left: ul,
             lower_right: lr,
+            gravitational_acceleration: Vec2::new(0.0, 9.81) * PIXELS_PER_METER,
             physics_components: Vec::<Physics>::default(),
             shape_components: Vec::<Shape>::default(),
             render_components: Vec::<Render>::default(),
@@ -51,9 +57,10 @@ impl World {
             color: Color::RGB(255, 0, 0),
             fill: true,
         };
-        let rend_idx = self.add_render(render); //TODO: Only need one render component if the balls
-                                                //all look the same.
-        let ball = Shape::Circle { radius: 0.25 };
+        let rend_idx = self.add_render(render); //TODO: Only need one render component if the balls all look the same.
+        let ball = Shape::Circle {
+            radius: 0.25 * PIXELS_PER_METER,
+        };
         let phys_idx = self.add_physics(Physics::new(
             Vec2::new(pos.0 as f32, pos.1 as f32),
             5.0,
@@ -75,7 +82,10 @@ impl World {
             fill: false,
         };
         let rend_idx = self.add_render(render); //TODO: As above.
-        let rect = Shape::Rectangle { w: 0.2, h: 0.2 };
+        let rect = Shape::Rectangle {
+            w: 0.2 * PIXELS_PER_METER,
+            h: 0.2 * PIXELS_PER_METER,
+        };
         let phys_idx = self.add_physics(Physics::new(
             Vec2::new(pos.0 as f32, pos.1 as f32),
             10.0,
@@ -92,16 +102,11 @@ impl World {
     }
 
     pub fn update_physics(&mut self, delta_time_seconds: f32) {
-        // TODO:  Make members!
-        let gravity = Vec2::new(0.0, 9.81) * PIXELS_PER_METER;
-        let _wind = Vec2::new(5.0, 0.0) * PIXELS_PER_METER;
-        let torque = 0.001;
-
         for mut entity in &mut self.entities {
             entity.colliding = false;
         }
 
-        if self.entities.len() > 2 {
+        if self.entities.len() > 1 {
             for i in 0..self.entities.len() - 1 {
                 let Some(si) = self.entities[i].get_index_for(Component::Shape) else {
                     continue;
@@ -118,23 +123,24 @@ impl World {
                         break;
                     };
 
-                    self.entities[i].colliding = Collision::test(
+                    if collision_test(
                         &self.shape_components[si],
                         &self.shape_components[sj],
                         &self.physics_components[pi],
                         &self.physics_components[pj],
-                    );
-
-                    self.entities[j].colliding = self.entities[i].colliding;
+                    ) {
+                        self.entities[j].colliding = true;
+                        self.entities[i].colliding = true;
+                    }
                 }
             }
         }
 
         // TODO:
         self.physics_components.iter_mut().for_each(|physics| {
-            let weight = gravity / physics.inverse_mass;
+            let weight = self.gravitational_acceleration * physics.mass;
             physics.apply_force(weight);
-            //physics.apply_torque(torque);
+            physics.apply_torque(0.01);
             //physics.apply_force(Force::drag(0.001, physics.velocity));
             //physics.apply_force(Force::friction(0.65, physics.velocity));
             //physics.apply_force(wind);
