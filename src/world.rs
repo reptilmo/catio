@@ -1,6 +1,6 @@
 use crate::entity::{Component, Entity, EntityBuilder};
 use crate::graphics::Render;
-use catphys::{Force, Physics, Shape, Vec2};
+use catphys::{Collision, Force, Physics, Shape, Vec2};
 use sdl2::pixels::Color;
 
 pub const PIXELS_PER_METER: f32 = 100.0;
@@ -53,7 +53,7 @@ impl World {
         };
         let rend_idx = self.add_render(render); //TODO: Only need one render component if the balls
                                                 //all look the same.
-        let ball = Shape::Circle { radius: 0.1 };
+        let ball = Shape::Circle { radius: 0.25 };
         let phys_idx = self.add_physics(Physics::new(
             Vec2::new(pos.0 as f32, pos.1 as f32),
             5.0,
@@ -71,7 +71,7 @@ impl World {
 
     pub fn spawn_box(&mut self, pos: (i32, i32)) {
         let render = Render {
-            color: Color::RGB(50, 50, 255),
+            color: Color::RGB(0, 255, 0),
             fill: false,
         };
         let rend_idx = self.add_render(render); //TODO: As above.
@@ -92,17 +92,50 @@ impl World {
     }
 
     pub fn update_physics(&mut self, delta_time_seconds: f32) {
-        // TODO:
+        // TODO:  Make members!
         let gravity = Vec2::new(0.0, 9.81) * PIXELS_PER_METER;
         let _wind = Vec2::new(5.0, 0.0) * PIXELS_PER_METER;
         let torque = 0.001;
+
+        for mut entity in &mut self.entities {
+            entity.colliding = false;
+        }
+
+        if self.entities.len() > 2 {
+            for i in 0..self.entities.len() - 1 {
+                let Some(si) = self.entities[i].get_index_for(Component::Shape) else {
+                    continue;
+                };
+                let Some(pi) = self.entities[i].get_index_for(Component::Physics) else {
+                    continue;
+                };
+
+                for j in i + 1..self.entities.len() {
+                    let Some(sj) = self.entities[j].get_index_for(Component::Shape) else {
+                        break;
+                    };
+                    let Some(pj) = self.entities[j].get_index_for(Component::Physics) else {
+                        break;
+                    };
+
+                    self.entities[i].colliding = Collision::test(
+                        &self.shape_components[si],
+                        &self.shape_components[sj],
+                        &self.physics_components[pi],
+                        &self.physics_components[pj],
+                    );
+
+                    self.entities[j].colliding = self.entities[i].colliding;
+                }
+            }
+        }
 
         // TODO:
         self.physics_components.iter_mut().for_each(|physics| {
             let weight = gravity / physics.inverse_mass;
             physics.apply_force(weight);
-            physics.apply_torque(torque);
-            physics.apply_force(Force::drag(0.001, physics.velocity));
+            //physics.apply_torque(torque);
+            //physics.apply_force(Force::drag(0.001, physics.velocity));
             //physics.apply_force(Force::friction(0.65, physics.velocity));
             //physics.apply_force(wind);
             physics.integrate(delta_time_seconds);

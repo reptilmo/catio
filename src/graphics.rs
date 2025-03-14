@@ -62,6 +62,7 @@ impl Graphics {
         }
     }
 
+    // https://en.wikipedia.org/wiki/Bresenham's_line_algorithm
     pub fn draw_line(&mut self, x0: i32, y0: i32, x1: i32, y1: i32) {
         let mut x0 = x0;
         let mut y0 = y0;
@@ -124,8 +125,7 @@ impl Graphics {
         v2 += origin;
         v3 += origin;
 
-        // TODO:
-        // Filled triangles or draw lines!
+        // TODO: Draw filled box!
         self.draw_line(v0.x as i32, v0.y as i32, v1.x as i32, v1.y as i32);
         self.draw_line(v1.x as i32, v1.y as i32, v2.x as i32, v2.y as i32);
         self.draw_line(v2.x as i32, v2.y as i32, v3.x as i32, v3.y as i32);

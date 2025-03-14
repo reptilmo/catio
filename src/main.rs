@@ -1,6 +1,7 @@
 extern crate sdl2;
 
 use sdl2::keyboard::Scancode;
+use sdl2::pixels::Color;
 use sdl2::mouse::MouseButton;
 use sdl2::surface::Surface;
 use std::time::Duration;
@@ -62,7 +63,11 @@ fn update_world(
                 let rotation = world.physics_components[idx].rotation;
                 if let Some(idx) = entity.get_index_for(Component::Shape) {
                     let shape = &world.shape_components[idx];
-                    gfx.set_draw_color(color);
+                    if entity.colliding {
+                        gfx.set_draw_color(Color::RGB(255, 255, 255));
+                    } else {
+                        gfx.set_draw_color(color);
+                    }
                     match shape {
                         Shape::Circle { radius } => gfx.draw_circle(
                             (pos.x as i32, pos.y as i32),

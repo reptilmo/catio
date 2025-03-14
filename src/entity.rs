@@ -16,7 +16,8 @@ pub enum State {
 
 pub struct Entity {
     component_idx: BTreeMap<Component, usize>,
-    current_state: State,
+    pub current_state: State,
+    pub colliding: bool,
 }
 
 #[derive(Default)]
@@ -71,6 +72,7 @@ impl EntityBuilder {
             component_idx: self.component_idx,
             // A new entity is always idle.
             current_state: State::Idle,
+            colliding: false,
         }
     }
 }
@@ -80,7 +82,9 @@ fn entity_builder_test() {
     let entity = EntityBuilder::new()
         .with_physics_component(123)
         .with_render_component(456)
+        .with_shape_component(123)
         .build();
     assert_eq!(123, entity.get_index_for(Component::Physics).unwrap());
     assert_eq!(456, entity.get_index_for(Component::Render).unwrap());
+    assert_eq!(123, entity.get_index_for(Component::Shape).unwrap());
 }
