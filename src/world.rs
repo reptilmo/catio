@@ -1,6 +1,6 @@
 use crate::entity::{Component, Entity, EntityBuilder};
 use crate::graphics::Render;
-use catphys::{collision_test, Collision, Force, Physics, Shape, Vec2};
+use catphys::{Collision, Force, Physics, Shape, Vec2};
 use sdl2::pixels::Color;
 
 pub const PIXELS_PER_METER: f32 = 100.0;
@@ -59,7 +59,7 @@ impl World {
         };
         let rend_idx = self.add_render(render); //TODO: Only need one render component if the balls all look the same.
         let ball = Shape::Circle {
-            radius: 0.25 * PIXELS_PER_METER,
+            radius: 0.1 * PIXELS_PER_METER,
         };
         let phys_idx = self.add_physics(Physics::new(
             Vec2::new(pos.0 as f32, pos.1 as f32),
@@ -101,11 +101,11 @@ impl World {
         );
     }
 
+
     pub fn update_physics(&mut self, delta_time_seconds: f32) {
         for mut entity in &mut self.entities {
             entity.colliding = false;
         }
-
         if self.entities.len() > 1 {
             for i in 0..self.entities.len() - 1 {
                 let Some(si) = self.entities[i].get_index_for(Component::Shape) else {
@@ -123,7 +123,7 @@ impl World {
                         break;
                     };
 
-                    if collision_test(
+                    if let Some(collision) = Collision::detect(
                         &self.shape_components[si],
                         &self.shape_components[sj],
                         &self.physics_components[pi],
@@ -131,11 +131,17 @@ impl World {
                     ) {
                         self.entities[j].colliding = true;
                         self.entities[i].colliding = true;
+                        let displacement = collision.resolve_projection(
+                            self.physics_components[pi].inverse_mass,
+                            self.physics_components[pj].inverse_mass,
+                        );
+
+                        self.physics_components[pi].position -= displacement.0;
+                        self.physics_components[pj].position += displacement.1;
                     }
                 }
             }
         }
-
         // TODO:
         self.physics_components.iter_mut().for_each(|physics| {
             let weight = self.gravitational_acceleration * physics.mass;
@@ -160,7 +166,7 @@ impl World {
                 physics.velocity.y = 0.0;
             } else if physics.position.y >= self.lower_right.y {
                 physics.position.y = self.lower_right.y;
-                physics.velocity.y *= -0.7;
+                physics.velocity.y = 0.0;
             }
         });
     }
