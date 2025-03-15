@@ -12,6 +12,8 @@ pub struct Physics {
     pub torque: f32,
     pub angular_mass: f32,
     pub inverse_angular_mass: f32,
+
+    pub restitution: f32,
 }
 
 impl Physics {
@@ -29,6 +31,8 @@ impl Physics {
             torque: 0.0,
             angular_mass,
             inverse_angular_mass: 1.0 / angular_mass,
+            //https://phys.libretexts.org/Courses/Prince_Georges_Community_College/General_Physics_I%3A_Classical_Mechanics/31%3A_Collisions/31.01%3A_The_Coefficient_of_Restitution
+            restitution: 0.5, // 1.0 (bouncy) elastic colision, 0.0 inelastic collision
         }
     }
 

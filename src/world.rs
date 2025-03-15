@@ -11,8 +11,9 @@ pub struct World {
 
     // Environment and world forces.
     gravitational_acceleration: Vec2,
+    wind: Vec2,
 
-    // Entity component.
+    // Entity-component.
     pub physics_components: Vec<Physics>,
     pub shape_components: Vec<Shape>,
     pub render_components: Vec<Render>,
@@ -25,6 +26,7 @@ impl World {
             upper_left: ul,
             lower_right: lr,
             gravitational_acceleration: Vec2::new(0.0, 9.81) * PIXELS_PER_METER,
+            wind: Vec2::new(0.05, 0.0) * PIXELS_PER_METER,
             physics_components: Vec::<Physics>::default(),
             shape_components: Vec::<Shape>::default(),
             render_components: Vec::<Render>::default(),
@@ -105,8 +107,9 @@ impl World {
         self.physics_components.iter_mut().for_each(|physics| {
             let weight = self.gravitational_acceleration * physics.mass;
             physics.apply_force(weight);
+            //physics.apply_force(self.wind);
             //physics.apply_torque(0.01);
-            physics.apply_force(Force::drag(0.0001, physics.velocity));
+            //physics.apply_force(Force::drag(0.1, physics.velocity));
             //physics.apply_force(Force::friction(0.65, physics.velocity));
             //physics.apply_force(wind);
             physics.integrate(delta_time_seconds);
@@ -149,6 +152,14 @@ impl World {
 
                         self.physics_components[pi].position -= displacement.0;
                         self.physics_components[pj].position += displacement.1;
+
+                        let impulse = collision.resolve_impulse(
+                            &self.physics_components[pi],
+                            &self.physics_components[pj],
+                        );
+
+                        self.physics_components[pi].apply_impulse(impulse);
+                        self.physics_components[pj].apply_impulse(-impulse);
                     }
                 }
             }

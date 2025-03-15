@@ -39,7 +39,7 @@ impl Vec2 {
     pub fn unit(&self) -> Vec2 {
         let magnitude = self.magnitude();
 
-        if magnitude >= std::f32::EPSILON {
+        if magnitude >= f32::EPSILON {
             return *self * (1.0 / self.magnitude());
         }
 

@@ -39,4 +39,13 @@ impl Collision {
             self.normal * d * inverse_mass_b,
         )
     }
+
+    pub fn resolve_impulse(&self, pa: &Physics, pb: &Physics) -> Vec2 {
+        let e = f32::min(pa.restitution, pb.restitution);
+        let v = pa.velocity - pb.velocity;
+        let impulse_magnitude =
+            -(1.0 + e) * self.normal.dot(v) / (pa.inverse_mass + pb.inverse_mass);
+
+        self.normal * impulse_magnitude
+    }
 }
