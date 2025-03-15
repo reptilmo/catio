@@ -16,7 +16,7 @@ pub enum State {
 
 pub struct Entity {
     component_idx: BTreeMap<Component, usize>,
-    pub current_state: State,
+    pub state: State,
     pub colliding: bool,
 }
 
@@ -34,13 +34,13 @@ impl Entity {
         self.component_idx.get(&comp).copied()
     }
 
-    pub fn update_state(&mut self, state: State) -> bool {
+    pub fn update_state(&mut self, s: State) -> bool {
         // TODO:
-        if self.current_state == State::Jumping && state == State::Jumping {
+        if self.state == State::Jumping && s == State::Jumping {
             return false;
         }
 
-        self.current_state = state;
+        self.state = s;
         true
     }
 }
@@ -71,7 +71,7 @@ impl EntityBuilder {
         Entity {
             component_idx: self.component_idx,
             // A new entity is always idle.
-            current_state: State::Idle,
+            state: State::Idle,
             colliding: false,
         }
     }

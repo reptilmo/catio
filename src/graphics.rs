@@ -14,6 +14,7 @@ pub struct Render {
     pub fill: bool,
 }
 
+#[allow(unused)]
 impl Graphics {
     pub fn new(canvas: WindowCanvas) -> Self {
         Self { canvas }

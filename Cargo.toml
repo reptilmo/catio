@@ -15,3 +15,24 @@ path = "src/main.rs"
 version = "0.37.0"
 default-features = false
 features = ["ttf"]
+
+[profile.dev]
+opt-level = 0
+debug = true
+strip = false
+debug-assertions = true
+overflow-checks = true
+panic = "unwind"
+
+[profile.release]
+opt-level = 3
+codegen-units = 16
+debug = false
+strip = true
+debug-assertions = false
+overflow-checks = false
+panic = "abort"
+
+[profile.release-lto]
+inherits = "release"
+lto = true

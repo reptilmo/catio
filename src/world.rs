@@ -109,8 +109,8 @@ impl World {
             physics.apply_force(weight);
             //physics.apply_force(self.wind);
             //physics.apply_torque(0.01);
-            //physics.apply_force(Force::drag(0.1, physics.velocity));
-            //physics.apply_force(Force::friction(0.65, physics.velocity));
+            physics.apply_force(Force::drag(0.001, physics.velocity));
+            physics.apply_force(Force::friction(0.65, physics.velocity));
             //physics.apply_force(wind);
             physics.integrate(delta_time_seconds);
             physics.integrate_angular(delta_time_seconds);
