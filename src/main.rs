@@ -81,7 +81,7 @@ fn update_world(
     }
     gfx.copy_from_surface(fps);
     gfx.end_frame();
-    //::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
+    //std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
 
     still_running
 }

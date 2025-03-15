@@ -101,11 +101,22 @@ impl World {
         );
     }
 
-
     pub fn update_physics(&mut self, delta_time_seconds: f32) {
+        self.physics_components.iter_mut().for_each(|physics| {
+            let weight = self.gravitational_acceleration * physics.mass;
+            physics.apply_force(weight);
+            //physics.apply_torque(0.01);
+            physics.apply_force(Force::drag(0.0001, physics.velocity));
+            //physics.apply_force(Force::friction(0.65, physics.velocity));
+            //physics.apply_force(wind);
+            physics.integrate(delta_time_seconds);
+            physics.integrate_angular(delta_time_seconds);
+        });
+
         for mut entity in &mut self.entities {
             entity.colliding = false;
         }
+
         if self.entities.len() > 1 {
             for i in 0..self.entities.len() - 1 {
                 let Some(si) = self.entities[i].get_index_for(Component::Shape) else {
@@ -144,15 +155,6 @@ impl World {
         }
         // TODO:
         self.physics_components.iter_mut().for_each(|physics| {
-            let weight = self.gravitational_acceleration * physics.mass;
-            physics.apply_force(weight);
-            physics.apply_torque(0.01);
-            //physics.apply_force(Force::drag(0.001, physics.velocity));
-            //physics.apply_force(Force::friction(0.65, physics.velocity));
-            //physics.apply_force(wind);
-            physics.integrate(delta_time_seconds);
-            physics.integrate_angular(delta_time_seconds);
-            // TODO:
             if physics.position.x <= self.upper_left.x {
                 physics.position.x = self.upper_left.x;
                 physics.velocity.x = 0.0;
