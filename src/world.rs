@@ -54,19 +54,21 @@ impl World {
         self.entities.len() - 1
     }
 
-    pub fn spawn_ball(&mut self, pos: (i32, i32)) {
+    pub fn spawn_ball(&mut self, pos: (i32, i32), rad: f32, mass: f32) {
         let render = Render {
             texture_idx: None,
             color: Color::RGB(255, 0, 0),
             fill: true,
         };
-        let rend_idx = self.add_render(render); //TODO: Only need one render component if the balls all look the same.
+        //TODO: Only need one render component
+        // if the balls all look the same.
+        let rend_idx = self.add_render(render);
         let ball = Shape::Circle {
-            radius: 0.1 * PIXELS_PER_METER,
+            radius: rad * PIXELS_PER_METER,
         };
         let phys_idx = self.add_physics(Physics::new(
             Vec2::new(pos.0 as f32, pos.1 as f32),
-            100.0,
+            mass,
             ball.rotational_inertia(),
         ));
         let shape_idx = self.add_shape(ball);

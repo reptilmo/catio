@@ -46,11 +46,13 @@ fn update_world(
     }
 
     if input.mouse_pressed(MouseButton::Left) && !input.mouse_was_pressed(MouseButton::Left) {
-        world.spawn_ball(input.mouse_position());
+        for _ in 0..10 {
+            world.spawn_ball(input.mouse_position(), 0.05, 1.0);
+        }
     } else if input.mouse_pressed(MouseButton::Right)
         && !input.mouse_was_pressed(MouseButton::Right)
     {
-        world.spawn_box(input.mouse_position());
+        world.spawn_ball(input.mouse_position(), 0.5, 10.0);
     }
 
     world.update_physics(delta_time_secs);
