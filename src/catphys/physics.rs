@@ -7,6 +7,7 @@ pub struct Physics {
     pub mass: f32,
     pub inverse_mass: f32,
 
+    // TODO: Perhaps split this struct into Physics and RotationalPhysics later.
     pub rotation: f32,
     pub angular_velocity: f32,
     pub torque: f32,
@@ -32,7 +33,7 @@ impl Physics {
             angular_mass,
             inverse_angular_mass: 1.0 / angular_mass,
             //https://phys.libretexts.org/Courses/Prince_Georges_Community_College/General_Physics_I%3A_Classical_Mechanics/31%3A_Collisions/31.01%3A_The_Coefficient_of_Restitution
-            restitution: 0.5, // 1.0 (bouncy) elastic colision, 0.0 inelastic collision
+            restitution: 1.0, // 1.0 (bouncy) elastic colision, 0.0 inelastic collision
         }
     }
 

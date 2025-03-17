@@ -191,7 +191,7 @@ mod tests {
         let a = Vec2::new(1.0, 0.0);
         let b = a.rotate(std::f32::consts::PI);
         assert_eq!(b.x, -1.0);
-        assert!(b.y.abs() <= std::f32::EPSILON); // Rust has nothing for this :/
+        assert!(b.y.abs() <= std::f32::EPSILON); // Rust has nothing for this? :/
         let c = a.rotate(std::f32::consts::PI * 0.5);
         assert!(c.x.abs() <= std::f32::EPSILON);
         assert_eq!(c.y, 1.0);

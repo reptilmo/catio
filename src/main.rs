@@ -4,6 +4,7 @@ use sdl2::keyboard::Scancode;
 use sdl2::mouse::MouseButton;
 use sdl2::pixels::Color;
 use sdl2::surface::Surface;
+use std::path::Path;
 use std::time::Duration;
 
 mod entity;
@@ -72,7 +73,7 @@ fn update_world(
                         Shape::Circle { radius } => {
                             gfx.draw_circle((pos.x as i32, pos.y as i32), *radius as i32)
                         }
-                        Shape::Rectangle { w, h } => gfx.draw_box(pos, *w, *h, rotation),
+                        Shape::Rect { w, h } => gfx.draw_box(pos, *w, *h, rotation),
                         _ => (),
                     }
                 }
@@ -88,7 +89,7 @@ fn update_world(
 
 fn main() {
     let error = System::init("fonts/WorkSans-Regular.ttf".to_string());
-    let mut system = match error {
+    let system = match error {
         Err(e) => {
             eprintln!("{}", e);
             std::process::exit(1);
@@ -104,7 +105,16 @@ fn main() {
         }
         Ok(gfx) => gfx,
     };
-
+    /*
+        let error = graphics.load_texture(&Path::new("images/cat_small.png"));
+        match error {
+            Err(e) => {
+                eprintln!("{}", e);
+                std::process::exit(1);
+            }
+            Ok(_) => (),
+        }
+    */
     let error = system.init_input();
     let mut input = match error {
         Err(e) => {

@@ -71,7 +71,7 @@ impl System {
         Ok(Input::new(event_pump))
     }
 
-    pub fn run<F>(&mut self, frame: F, world: &mut World, input: &mut Input, gfx: &mut Graphics)
+    pub fn run<F>(&self, frame: F, world: &mut World, input: &mut Input, gfx: &mut Graphics)
     where
         F: Fn(&mut World, &mut Input, &mut Graphics, &Surface, f32) -> bool,
     {

@@ -1,23 +1,49 @@
 use catphys::Vec2;
+use sdl2::image::LoadTexture;
 use sdl2::pixels::Color;
 use sdl2::rect::Point;
 use sdl2::rect::Rect;
-use sdl2::render::WindowCanvas;
+use sdl2::render::{Texture, TextureCreator, WindowCanvas};
 use sdl2::surface::Surface;
+use sdl2::video::WindowContext;
+use std::cell::Cell;
+use std::path::Path;
 
-pub struct Graphics {
+pub struct Graphics<'a> {
     canvas: WindowCanvas,
+    texture_creator: Option<TextureCreator<WindowContext>>,
+    textures: Vec<Texture<'a>>,
 }
 
 pub struct Render {
+    pub texture_idx: Option<usize>,
     pub color: Color,
     pub fill: bool,
 }
 
 #[allow(unused)]
-impl Graphics {
-    pub fn new(canvas: WindowCanvas) -> Self {
-        Self { canvas }
+impl<'a> Graphics<'a> {
+    pub fn new(c: WindowCanvas) -> Self {
+        Self {
+            canvas: c,
+            texture_creator: None,
+            textures: Vec::<Texture<'a>>::default(),
+        }
+    }
+
+    pub fn load_texture(&'a mut self, path: &Path) -> Result<usize, String> {
+        // HA! Lifetimes and their syntax... why does Rust want to be so weird?
+        if self.texture_creator.is_none() {
+            self.texture_creator = Some(self.canvas.texture_creator());
+        }
+
+        let texture = self
+            .texture_creator
+            .as_mut()
+            .expect("texture creator error")
+            .load_texture(path)?;
+        self.textures.push(texture);
+        Ok(self.textures.len() - 1)
     }
 
     pub fn copy_from_surface(&mut self, surface: &Surface) {
@@ -127,9 +153,20 @@ impl Graphics {
         v3 += origin;
 
         // TODO: Draw filled box!
+        // NOTE: Canvas already has functions for drawing primitives.
         self.draw_line(v0.x as i32, v0.y as i32, v1.x as i32, v1.y as i32);
         self.draw_line(v1.x as i32, v1.y as i32, v2.x as i32, v2.y as i32);
         self.draw_line(v2.x as i32, v2.y as i32, v3.x as i32, v3.y as i32);
         self.draw_line(v3.x as i32, v3.y as i32, v0.x as i32, v0.y as i32);
+    }
+
+    pub fn draw_texture(&mut self, idx: usize, x: i16, y: i16, width: i16, height: i16) {
+        self.canvas
+            .copy(
+                &self.textures[idx],
+                None,
+                Some(Rect::new(x.into(), y.into(), width as u32, height as u32)),
+            )
+            .unwrap();
     }
 }

@@ -56,6 +56,7 @@ impl World {
 
     pub fn spawn_ball(&mut self, pos: (i32, i32)) {
         let render = Render {
+            texture_idx: None,
             color: Color::RGB(255, 0, 0),
             fill: true,
         };
@@ -65,7 +66,7 @@ impl World {
         };
         let phys_idx = self.add_physics(Physics::new(
             Vec2::new(pos.0 as f32, pos.1 as f32),
-            5.0,
+            100.0,
             ball.rotational_inertia(),
         ));
         let shape_idx = self.add_shape(ball);
@@ -80,17 +81,18 @@ impl World {
 
     pub fn spawn_box(&mut self, pos: (i32, i32)) {
         let render = Render {
+            texture_idx: None,
             color: Color::RGB(0, 255, 0),
             fill: false,
         };
         let rend_idx = self.add_render(render); //TODO: As above.
-        let rect = Shape::Rectangle {
-            w: 0.2 * PIXELS_PER_METER,
-            h: 0.2 * PIXELS_PER_METER,
+        let rect = Shape::Rect {
+            w: 0.8 * PIXELS_PER_METER,
+            h: 0.8 * PIXELS_PER_METER,
         };
         let phys_idx = self.add_physics(Physics::new(
             Vec2::new(pos.0 as f32, pos.1 as f32),
-            10.0,
+            1.0,
             rect.rotational_inertia(),
         ));
         let shape_idx = self.add_shape(rect);
@@ -116,7 +118,7 @@ impl World {
             physics.integrate_angular(delta_time_seconds);
         });
 
-        for mut entity in &mut self.entities {
+        for entity in &mut self.entities {
             entity.colliding = false;
         }
 
@@ -145,7 +147,8 @@ impl World {
                     ) {
                         self.entities[j].colliding = true;
                         self.entities[i].colliding = true;
-                        let displacement = collision.resolve_projection(
+
+                        let displacement = collision.resolve_penetration(
                             self.physics_components[pi].inverse_mass,
                             self.physics_components[pj].inverse_mass,
                         );

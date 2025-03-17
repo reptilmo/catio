@@ -13,7 +13,7 @@ pub struct Input {
     mouse_pos_y: i32,
 }
 
-#[allow(unsused)]
+#[allow(unused)]
 impl Input {
     pub fn new(pump: EventPump) -> Self {
         Self {
