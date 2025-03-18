@@ -57,10 +57,28 @@ impl Vec2 {
         *self - (normal * 2.0 * self.dot(normal))
     }
 
+    #[inline]
     pub fn rotate(&self, rads: f32) -> Vec2 {
         Vec2 {
             x: self.x * rads.cos() - self.y * rads.sin(),
             y: self.x * rads.sin() + self.y * rads.cos(),
+        }
+    }
+
+    // Get Vec2's perpendicular to this Vec2 in either direction.
+    #[inline]
+    pub fn normal_positive(&self) -> Vec2 {
+        Vec2 {
+            x: self.y,
+            y: -self.x,
+        }
+    }
+
+    #[inline]
+    pub fn normal_negative(&self) -> Vec2 {
+        Vec2 {
+            x: -self.y,
+            y: self.x,
         }
     }
 }

@@ -45,6 +45,7 @@ impl Entity {
     }
 }
 
+#[allow(unused)]
 impl EntityBuilder {
     pub fn new() -> Self {
         Self {

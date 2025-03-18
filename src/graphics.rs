@@ -6,7 +6,6 @@ use sdl2::rect::Rect;
 use sdl2::render::{Texture, TextureCreator, WindowCanvas};
 use sdl2::surface::Surface;
 use sdl2::video::WindowContext;
-use std::cell::Cell;
 use std::path::Path;
 
 pub struct Graphics<'a> {

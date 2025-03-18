@@ -18,6 +18,8 @@ pub struct World {
     pub shape_components: Vec<Shape>,
     pub render_components: Vec<Render>,
     pub entities: Vec<Entity>,
+
+    pub player: bool,
 }
 
 impl World {
@@ -31,6 +33,7 @@ impl World {
             shape_components: Vec::<Shape>::default(),
             render_components: Vec::<Render>::default(),
             entities: Vec::<Entity>::default(),
+            player: false,
         }
     }
 
@@ -81,7 +84,7 @@ impl World {
         );
     }
 
-    pub fn spawn_box(&mut self, pos: (i32, i32)) {
+    pub fn spawn_box(&mut self, pos: (i32, i32), width: f32, height: f32, mass: f32) {
         let render = Render {
             texture_idx: None,
             color: Color::RGB(0, 255, 0),
@@ -89,12 +92,12 @@ impl World {
         };
         let rend_idx = self.add_render(render); //TODO: As above.
         let rect = Shape::Rect {
-            w: 0.8 * PIXELS_PER_METER,
-            h: 0.8 * PIXELS_PER_METER,
+            w: width * PIXELS_PER_METER,
+            h: height * PIXELS_PER_METER,
         };
         let phys_idx = self.add_physics(Physics::new(
             Vec2::new(pos.0 as f32, pos.1 as f32),
-            1.0,
+            mass,
             rect.rotational_inertia(),
         ));
         let shape_idx = self.add_shape(rect);

@@ -5,7 +5,7 @@ use sdl2::mouse::MouseButton;
 use sdl2::pixels::Color;
 use sdl2::surface::Surface;
 use std::path::Path;
-use std::time::Duration;
+//use std::time::Duration;
 
 mod entity;
 mod graphics;
@@ -13,7 +13,7 @@ mod input;
 mod system;
 mod world;
 
-use crate::entity::{Component, EntityBuilder};
+use crate::entity::Component;
 use crate::graphics::Graphics;
 use crate::input::Input;
 use crate::system::System;
@@ -24,12 +24,10 @@ const WIDTH: u32 = 1200u32;
 const HEIGHT: u32 = 800u32;
 
 fn make_world() -> World {
-    let world = World::new(
+    World::new(
         Vec2::new(10.0, 10.0),
         Vec2::new((WIDTH - 10) as f32, (HEIGHT - 10) as f32),
-    );
-
-    world
+    )
 }
 
 fn update_world(
@@ -43,6 +41,11 @@ fn update_world(
     input.update();
     if input.key_pressed(Scancode::Escape) {
         still_running = false;
+    }
+
+    if input.key_pressed(Scancode::P) && !input.key_was_pressed(Scancode::P) && !world.player {
+        world.spawn_box(((WIDTH / 2) as i32, (HEIGHT / 2) as i32), 2.0, 2.0, 1.0);
+        world.player = true;
     }
 
     if input.mouse_pressed(MouseButton::Left) && !input.mouse_was_pressed(MouseButton::Left) {

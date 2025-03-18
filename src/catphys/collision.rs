@@ -28,55 +28,14 @@ impl Collision {
                 Shape::Rect {
                     w: width,
                     h: height,
-                } => {
-                    let x_min = pb.position.x - (width * 0.5);
-                    let x_max = pb.position.x + (width * 0.5);
-                    let y_min = pb.position.y - (height * 0.5);
-                    let y_max = pb.position.y + (height * 0.5);
-                    let p = Vec2::new(
-                        pa.position.x.clamp(x_min, x_max),
-                        pa.position.y.clamp(y_min, y_max),
-                    );
-
-                    let direction = pa.position - p;
-                    if direction.magnitude2() <= (ra * ra) {
-                        let start = pb.position - (direction * *height);
-                        let end = pa.position + (direction * *ra);
-                        Some(Collision {
-                            normal: direction.unit(),
-                            depth: (start - end).magnitude(),
-                        })
-                    } else {
-                        None
-                    }
-                }
+                } => Self::rect_circle(*width, *height, *ra, pb, pa),
                 _ => None,
             },
             Shape::Rect {
                 w: width,
                 h: height,
             } => match sb {
-                Shape::Circle { radius: rb } => {
-                    let x_min = pa.position.x - (width * 0.5);
-                    let x_max = pa.position.x + (width * 0.5);
-                    let y_min = pa.position.y - (height * 0.5);
-                    let y_max = pa.position.y + (height * 0.5);
-                    let p = Vec2::new(
-                        pb.position.x.clamp(x_min, x_max),
-                        pb.position.y.clamp(y_min, y_max),
-                    );
-
-                    let direction = pb.position - p;
-                    let distance = direction.magnitude2();
-                    if distance <= (rb * rb) {
-                        Some(Collision {
-                            normal: direction.unit(),
-                            depth: rb - distance,
-                        })
-                    } else {
-                        None
-                    }
-                }
+                Shape::Circle { radius: r } => Self::rect_circle(*width, *height, *r, pb, pa),
                 _ => None,
             },
             _ => None,
@@ -98,5 +57,33 @@ impl Collision {
             -(1.0 + e) * self.normal.dot(v) / (pa.inverse_mass + pb.inverse_mass);
 
         self.normal * impulse_magnitude
+    }
+
+    fn rect_circle(
+        width: f32,
+        height: f32,
+        _radius: f32,
+        pr: &Physics,
+        pc: &Physics,
+    ) -> Option<Collision> {
+        let vert = [
+            Vec2::new(width * -0.5, height * -0.5) + pr.position,
+            Vec2::new(width * 0.5, height * -0.5) + pr.position,
+            Vec2::new(width * 0.5, height * 0.5) + pr.position,
+            Vec2::new(width * -0.5, height * 0.5) + pr.position,
+        ];
+
+        for p0 in 0..4 {
+            let p1 = (p0 + 1) % 4; //TODO: Avoid this division.
+
+            let normal = (vert[p1] - vert[p0]).normal_positive().unit();
+            let projection = (pc.position - vert[p0]).dot(normal);
+
+            if projection > 0.0 {
+                println!("Closest edge: {:?} {:?}", vert[p0], vert[p1]); //TODO:
+            }
+        }
+
+        None
     }
 }
