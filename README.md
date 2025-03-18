@@ -1,10 +1,13 @@
 # catio
 I originally planned to make a 2D platformer with some more or less passable physics provided by a library that could be used outside of this project. Currently this project is just a sandbox for testing 2D physics and various 2D game related behaviors and functionality. It is also a project for learning the Rust programming language, which is turning out to be the harder piece of this undertaking.
 
-## Features
+## Current Features
+Click one mouse button to spawn small circles (spawns 10 circles), click the other mouse button to spawn one bigger circle. Play around with gravity and particles. Press P to spawn player (currently under construction).
 
+## Building
+Use ```cargo build``` or ```cargo build --release``` or ```cargo build profile release-lto```.
 
-## Requires SDL libraries installed on the system.
+## Running requires SDL2 libraries installed on the system.
 ### Linux
 Install these through your favourite package management tool, or via
 http://www.libsdl.org/
