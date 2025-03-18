@@ -1,4 +1,6 @@
 # catio
+![image](https://github.com/reptilmo/catio/tree/develop/images/Screenshot.png)
+
 I originally planned to make a 2D platformer with some more or less passable physics provided by a library that could be used outside of this project. Currently this project is just a sandbox for testing 2D physics and various 2D game related behaviors and functionality. It is also a project for learning the Rust programming language, which is turning out to be the harder piece of this undertaking.
 
 ## Current Features
