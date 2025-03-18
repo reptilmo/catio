@@ -3,6 +3,7 @@ extern crate sdl2;
 use sdl2::keyboard::Scancode;
 use sdl2::mouse::MouseButton;
 use sdl2::pixels::Color;
+use sdl2::render::Texture;
 use sdl2::surface::Surface;
 use std::path::Path;
 //use std::time::Duration;
@@ -34,6 +35,7 @@ fn update_world(
     world: &mut World,
     input: &mut Input,
     gfx: &mut Graphics,
+    textures: &[Texture],
     fps: &Surface,
     delta_time_secs: f32,
 ) -> bool {
@@ -92,43 +94,19 @@ fn update_world(
     still_running
 }
 
-fn main() {
-    let error = System::init("fonts/WorkSans-Regular.ttf".to_string());
-    let system = match error {
-        Err(e) => {
-            eprintln!("{}", e);
-            std::process::exit(1);
-        }
-        Ok(ctx) => ctx,
-    };
-
-    let error = system.init_graphics(WIDTH, HEIGHT, false);
-    let mut graphics = match error {
-        Err(e) => {
-            eprintln!("{}", e);
-            std::process::exit(1);
-        }
-        Ok(gfx) => gfx,
-    };
-    /*
-        let error = graphics.load_texture(&Path::new("images/cat_small.png"));
-        match error {
-            Err(e) => {
-                eprintln!("{}", e);
-                std::process::exit(1);
-            }
-            Ok(_) => (),
-        }
-    */
-    let error = system.init_input();
-    let mut input = match error {
-        Err(e) => {
-            eprintln!("{}", e);
-            std::process::exit(1);
-        }
-        Ok(inpt) => inpt,
-    };
-
+fn run() -> Result<(), Box<dyn std::error::Error>> {
+    let system = System::init("fonts/WorkSans-Regular.ttf".to_string())?;
+    let mut graphics = system.init_graphics(WIDTH, HEIGHT, false)?;
+    let mut input = system.init_input()?;
     let mut world = make_world();
     system.run(update_world, &mut world, &mut input, &mut graphics);
+    Ok(())
 }
+
+fn main() {
+    if let Err(e) = run() {
+        eprintln!("{}", e);
+        std::process::exit(1);
+    }
+}
+                   
