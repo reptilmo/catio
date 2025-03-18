@@ -105,16 +105,16 @@ fn main() {
         }
         Ok(gfx) => gfx,
     };
-    /*
-        let error = graphics.load_texture(&Path::new("images/cat_small.png"));
-        match error {
-            Err(e) => {
-                eprintln!("{}", e);
-                std::process::exit(1);
-            }
-            Ok(_) => (),
+
+    let error = graphics.load_texture(&Path::new("images/cat_small.png"));
+    match error {
+        Err(e) => {
+            eprintln!("{}", e);
+            std::process::exit(1);
         }
-    */
+        Ok(_) => (),
+    }
+
     let error = system.init_input();
     let mut input = match error {
         Err(e) => {
