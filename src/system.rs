@@ -1,6 +1,8 @@
 extern crate sdl2;
 
+use sdl2::image::LoadTexture;
 use sdl2::pixels::Color;
+use sdl2::render::Texture;
 use sdl2::surface::Surface;
 use sdl2::ttf::Sdl2TtfContext;
 use sdl2::{Sdl, VideoSubsystem};
@@ -73,7 +75,7 @@ impl System {
 
     pub fn run<F>(&self, frame: F, world: &mut World, input: &mut Input, gfx: &mut Graphics)
     where
-        F: Fn(&mut World, &mut Input, &mut Graphics, &Surface, f32) -> bool,
+        F: Fn(&mut World, &mut Input, &mut Graphics, &[Texture], &Surface, f32) -> bool,
     {
         let path = Path::new(&self.system_font_path);
         let result = self.ttf_context.load_font(path, 16);
@@ -84,6 +86,11 @@ impl System {
                 return;
             }
         };
+        let texture_creator = gfx.texture_creator();
+        let mut textures = Vec::new();
+        textures.push(
+            texture_creator.load_texture("images/small_cat.png").unwrap()
+        );
 
         let mut running = true;
         let mut frame_count = 1u64;
@@ -106,7 +113,7 @@ impl System {
                 .blended(Color::RGBA(0, 255, 0, 255))
                 .unwrap();
 
-            running = frame(world, input, gfx, &fps, dt.as_secs_f32());
+            running = frame(world, input, gfx, &textures, &fps, dt.as_secs_f32());
             frame_count += 1;
         }
     }

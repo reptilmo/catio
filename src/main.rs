@@ -3,6 +3,7 @@ extern crate sdl2;
 use sdl2::keyboard::Scancode;
 use sdl2::mouse::MouseButton;
 use sdl2::pixels::Color;
+use sdl2::render::Texture;
 use sdl2::surface::Surface;
 use std::path::Path;
 use std::time::Duration;
@@ -36,6 +37,7 @@ fn update_world(
     world: &mut World,
     input: &mut Input,
     gfx: &mut Graphics,
+    textures: &[Texture],
     fps: &Surface,
     delta_time_secs: f32,
 ) -> bool {
@@ -90,7 +92,6 @@ fn update_world(
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let system = System::init("fonts/WorkSans-Regular.ttf".to_string())?;
     let mut graphics = system.init_graphics(WIDTH, HEIGHT, false)?;
-    let _ = graphics.load_texture(&Path::new("images/cat_small.png"))?;
     let mut input = system.init_input()?;
     let mut world = make_world();
     system.run(update_world, &mut world, &mut input, &mut graphics);
