@@ -1,14 +1,23 @@
 # catio
-![image](https://github.com/user-attachments/assets/c17a926c-8685-4756-8a4f-56a1bb197569)
-
+![image](https://github.com/user-attachments/assets/be7c88ee-e8e6-40ad-b266-807b4b272d62)
 
 I originally planned to make a 2D platformer with some more or less passable physics provided by a library that could be used outside of this project. Currently this project is just a sandbox for testing 2D physics and various 2D game related behaviors and functionality. It is also a project for learning the Rust programming language, which is turning out to be the harder piece of this undertaking.
 
 ## Current Features
-Click one mouse button to spawn small circles (spawns 10 circles), click the other mouse button to spawn one bigger circle. Play around with gravity and particles. Press P to spawn player (currently under construction).
+Click one mouse button to spawn a small circle, click the other mouse button to spawn a bigger circle. You can play around with circles and forces.
+
+Press P to spawn the player character (cat).
+
+Press right and left arrow buttons on the keyboard to move the cat right or left.
+
+Press spacebar to jump.
+
+Press escape to quit the app.
+
+Character controls are very rough at this point.
 
 ## Building
-Use ```cargo build``` or ```cargo build --release``` or ```cargo build profile release-lto```.
+Use ```cargo build``` or ```cargo build --release``` or ```cargo build --profile release-lto```.
 
 ## Running requires SDL2 libraries installed on the system.
 ### Linux
