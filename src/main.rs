@@ -92,43 +92,11 @@ fn update_world(
     still_running
 }
 
-fn main() {
-    let error = System::init("fonts/WorkSans-Regular.ttf".to_string());
-    let system = match error {
-        Err(e) => {
-            eprintln!("{}", e);
-            std::process::exit(1);
-        }
-        Ok(ctx) => ctx,
-    };
-
-    let error = system.init_graphics(WIDTH, HEIGHT, false);
-    let mut graphics = match error {
-        Err(e) => {
-            eprintln!("{}", e);
-            std::process::exit(1);
-        }
-        Ok(gfx) => gfx,
-    };
-    /*
-        let error = graphics.load_texture(&Path::new("images/cat_small.png"));
-        match error {
-            Err(e) => {
-                eprintln!("{}", e);
-                std::process::exit(1);
-            }
-            Ok(_) => (),
-        }
-    */
-    let error = system.init_input();
-    let mut input = match error {
-        Err(e) => {
-            eprintln!("{}", e);
-            std::process::exit(1);
-        }
-        Ok(inpt) => inpt,
-    };
-
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let system = System::init("fonts/WorkSans-Regular.ttf".to_string())?;
+    let mut graphics = system.init_graphics(WIDTH, HEIGHT, false)?;
+    let mut input = system.init_input()?;
     let mut world = make_world();
     system.run(update_world, &mut world, &mut input, &mut graphics);
+    Ok(())
 }
