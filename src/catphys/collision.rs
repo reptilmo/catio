@@ -123,13 +123,11 @@ impl Collision {
                             depth: radius - intersect.magnitude(),
                         });
                     }
-                } else {
-                    if distance_to_edge <= radius {
-                        return Some(Collision {
-                            normal: (v0 - v1).normal_positive().unit(),
-                            depth: radius - distance_to_edge,
-                        });
-                    }
+                } else if distance_to_edge <= radius {
+                    return Some(Collision {
+                        normal: (v0 - v1).normal_positive().unit(),
+                        depth: radius - distance_to_edge,
+                    });
                 }
             }
         } else {
