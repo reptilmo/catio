@@ -88,7 +88,7 @@ impl World {
             color: Color::RGB(0, 255, 0),
             fill: false,
         };
-        let rend_idx = self.add_render(render); //TODO: As above.
+        let rend_idx = self.add_render(render);
         let rect = Shape::Rect {
             w: width * PIXELS_PER_METER,
             h: height * PIXELS_PER_METER,
@@ -116,8 +116,8 @@ impl World {
             let weight = self.gravitational_acceleration * physics.mass;
             physics.apply_force(weight);
             //physics.apply_torque(0.01);
-            physics.apply_force(Force::drag(0.001, physics.velocity));
-            physics.apply_force(Force::friction(0.65, physics.velocity));
+            //physics.apply_force(Force::drag(0.001, physics.velocity));
+            //physics.apply_force(Force::friction(0.65, physics.velocity));
             physics.integrate(delta_time_seconds);
             physics.integrate_angular(delta_time_seconds);
         });

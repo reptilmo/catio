@@ -26,10 +26,6 @@ pub struct EntityBuilder {
 }
 
 impl Entity {
-    pub fn builder() -> EntityBuilder {
-        EntityBuilder::default()
-    }
-
     pub fn get_index_for(&self, comp: Component) -> Option<usize> {
         self.component_idx.get(&comp).copied()
     }

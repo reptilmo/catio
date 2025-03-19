@@ -4,7 +4,6 @@ use sdl2::keyboard::Scancode;
 use sdl2::mouse::MouseButton;
 use sdl2::pixels::Color;
 use sdl2::surface::Surface;
-use std::path::Path;
 //use std::time::Duration;
 
 mod entity;
@@ -65,7 +64,7 @@ fn update_world(
         if let Some(player_idx) = world.player_entity_idx {
             let player_phys_idx = world.entities[player_idx].get_index_for(Component::Physics);
             if let Some(idx) = player_phys_idx {
-                world.physics_components[idx].apply_impulse(Vec2::new(1.0, 0.0) * PIXELS_PER_METER);
+                world.physics_components[idx].apply_impulse(Vec2::new(0.05, 0.0) * PIXELS_PER_METER);
             }
         }
     }
@@ -75,16 +74,16 @@ fn update_world(
             let player_phys_idx = world.entities[player_idx].get_index_for(Component::Physics);
             if let Some(idx) = player_phys_idx {
                 world.physics_components[idx]
-                    .apply_impulse(Vec2::new(-1.0, 0.0) * PIXELS_PER_METER);
+                    .apply_impulse(Vec2::new(-0.05, 0.0) * PIXELS_PER_METER);
             }
         }
     }
 
     if input.mouse_pressed(MouseButton::Right) && !input.mouse_was_pressed(MouseButton::Right) {
-        world.spawn_ball(input.mouse_position(), 0.05, 10.0);
+        world.spawn_ball(input.mouse_position(), 0.1, 100.0);
     } else if input.mouse_pressed(MouseButton::Left) && !input.mouse_was_pressed(MouseButton::Left)
     {
-        world.spawn_ball(input.mouse_position(), 0.4, 100.0);
+        world.spawn_ball(input.mouse_position(), 0.4, 400.0);
     }
 
     world.update_physics(delta_time_secs);
