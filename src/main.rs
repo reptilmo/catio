@@ -3,6 +3,8 @@ extern crate sdl2;
 use sdl2::keyboard::Scancode;
 use sdl2::mouse::MouseButton;
 use sdl2::pixels::Color;
+use sdl2::rect::Rect;
+use sdl2::render::Texture;
 use sdl2::surface::Surface;
 //use std::time::Duration;
 
@@ -21,11 +23,12 @@ use catphys::{Shape, Vec2};
 
 const WIDTH: u32 = 1200u32;
 const HEIGHT: u32 = 800u32;
+const MARGIN: u32 = 25u32;
 
 fn make_world() -> World {
     World::new(
-        Vec2::new(10.0, 10.0),
-        Vec2::new((WIDTH - 10) as f32, (HEIGHT - 10) as f32),
+        Vec2::new(MARGIN as f32, MARGIN as f32),
+        Vec2::new((WIDTH - MARGIN) as f32, (HEIGHT - MARGIN) as f32),
     )
 }
 
@@ -33,6 +36,7 @@ fn update_world(
     world: &mut World,
     input: &mut Input,
     gfx: &mut Graphics,
+    texture: &Texture,
     fps: &Surface,
     delta_time_secs: f32,
 ) -> bool {
@@ -46,7 +50,7 @@ fn update_world(
         && !input.key_was_pressed(Scancode::P)
         && world.player_entity_idx.is_none()
     {
-        world.spawn_player(((WIDTH / 2) as i32, (HEIGHT / 2) as i32), 0.5, 0.5, 1.0);
+        world.spawn_player(((WIDTH / 2) as i32, (HEIGHT / 2) as i32), 0.5, 0.5, 2.0);
     }
 
     if input.key_pressed(Scancode::Space) && !input.key_was_pressed(Scancode::Space) {
@@ -55,7 +59,6 @@ fn update_world(
             let player_phys_idx = world.entities[player_idx].get_index_for(Component::Physics);
             if let Some(idx) = player_phys_idx {
                 world.physics_components[idx].position.y -= 0.5 * PIXELS_PER_METER;
-                // Hacky.
             }
         }
     }
@@ -64,7 +67,9 @@ fn update_world(
         if let Some(player_idx) = world.player_entity_idx {
             let player_phys_idx = world.entities[player_idx].get_index_for(Component::Physics);
             if let Some(idx) = player_phys_idx {
-                world.physics_components[idx].apply_impulse(Vec2::new(0.05, 0.0) * PIXELS_PER_METER);
+                world.flip_player_texture = false;
+                world.physics_components[idx]
+                    .apply_impulse(Vec2::new(0.08 * PIXELS_PER_METER, 0.0));
             }
         }
     }
@@ -73,14 +78,15 @@ fn update_world(
         if let Some(player_idx) = world.player_entity_idx {
             let player_phys_idx = world.entities[player_idx].get_index_for(Component::Physics);
             if let Some(idx) = player_phys_idx {
+                world.flip_player_texture = true;
                 world.physics_components[idx]
-                    .apply_impulse(Vec2::new(-0.05, 0.0) * PIXELS_PER_METER);
+                    .apply_impulse(Vec2::new(-0.08 * PIXELS_PER_METER, 0.0));
             }
         }
     }
 
     if input.mouse_pressed(MouseButton::Right) && !input.mouse_was_pressed(MouseButton::Right) {
-        world.spawn_ball(input.mouse_position(), 0.1, 100.0);
+        world.spawn_ball(input.mouse_position(), 0.05, 50.0);
     } else if input.mouse_pressed(MouseButton::Left) && !input.mouse_was_pressed(MouseButton::Left)
     {
         world.spawn_ball(input.mouse_position(), 0.4, 400.0);
@@ -98,7 +104,7 @@ fn update_world(
                 if let Some(idx) = entity.get_index_for(Component::Shape) {
                     let shape = &world.shape_components[idx];
                     if entity.colliding {
-                        gfx.set_draw_color(Color::RGB(255, 255, 255));
+                        gfx.set_draw_color(Color::RGB(99, 125, 10));
                     } else {
                         gfx.set_draw_color(color);
                     }
@@ -106,7 +112,17 @@ fn update_world(
                         Shape::Circle { radius } => {
                             gfx.draw_circle((pos.x as i32, pos.y as i32), *radius as i32)
                         }
-                        Shape::Rect { w, h } => gfx.draw_box(pos, *w, *h, rotation),
+                        Shape::Rect { w, h } => gfx.draw_texture(
+                            texture,
+                            Rect::new(
+                                (w * -0.5 + pos.x) as i32,
+                                (h * -0.5 + pos.y) as i32,
+                                *w as u32,
+                                *h as u32,
+                            ),
+                            world.flip_player_texture,
+                            rotation,
+                        ),
                         _ => (),
                     }
                 }

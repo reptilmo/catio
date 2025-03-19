@@ -18,6 +18,7 @@ pub struct World {
     pub render_components: Vec<Render>,
     pub entities: Vec<Entity>,
     pub player_entity_idx: Option<usize>,
+    pub flip_player_texture: bool,
 }
 
 impl World {
@@ -31,6 +32,7 @@ impl World {
             render_components: Vec::<Render>::default(),
             entities: Vec::<Entity>::default(),
             player_entity_idx: None,
+            flip_player_texture: false,
         }
     }
 
@@ -56,9 +58,7 @@ impl World {
 
     pub fn spawn_ball(&mut self, pos: (i32, i32), rad: f32, mass: f32) {
         let render = Render {
-            texture_idx: None,
-            color: Color::RGB(255, 0, 0),
-            fill: true,
+            color: Color::RGB(255, 255, 255),
         };
         //TODO: Only need one render component
         // if the balls all look the same.
@@ -84,9 +84,7 @@ impl World {
 
     pub fn spawn_player(&mut self, pos: (i32, i32), width: f32, height: f32, mass: f32) {
         let render = Render {
-            texture_idx: None,
             color: Color::RGB(0, 255, 0),
-            fill: false,
         };
         let rend_idx = self.add_render(render);
         let rect = Shape::Rect {
@@ -117,7 +115,7 @@ impl World {
             physics.apply_force(weight);
             //physics.apply_torque(0.01);
             //physics.apply_force(Force::drag(0.001, physics.velocity));
-            //physics.apply_force(Force::friction(0.65, physics.velocity));
+            physics.apply_force(Force::friction(0.65, physics.velocity));
             physics.integrate(delta_time_seconds);
             physics.integrate_angular(delta_time_seconds);
         });

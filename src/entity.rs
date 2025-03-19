@@ -7,16 +7,8 @@ pub enum Component {
     Render,
 }
 
-#[derive(PartialEq)]
-pub enum State {
-    Idle,
-    Walking,
-    Jumping,
-}
-
 pub struct Entity {
     component_idx: BTreeMap<Component, usize>,
-    pub state: State,
     pub colliding: bool,
 }
 
@@ -28,16 +20,6 @@ pub struct EntityBuilder {
 impl Entity {
     pub fn get_index_for(&self, comp: Component) -> Option<usize> {
         self.component_idx.get(&comp).copied()
-    }
-
-    pub fn update_state(&mut self, s: State) -> bool {
-        // TODO:
-        if self.state == State::Jumping && s == State::Jumping {
-            return false;
-        }
-
-        self.state = s;
-        true
     }
 }
 
@@ -67,8 +49,6 @@ impl EntityBuilder {
     pub fn build(self) -> Entity {
         Entity {
             component_idx: self.component_idx,
-            // A new entity is always idle.
-            state: State::Idle,
             colliding: false,
         }
     }

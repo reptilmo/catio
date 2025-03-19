@@ -1,6 +1,8 @@
 extern crate sdl2;
 
+use sdl2::image::LoadTexture;
 use sdl2::pixels::Color;
+use sdl2::render::Texture;
 use sdl2::surface::Surface;
 use sdl2::ttf::Sdl2TtfContext;
 use sdl2::{Sdl, VideoSubsystem};
@@ -73,7 +75,7 @@ impl System {
 
     pub fn run<F>(&self, frame: F, world: &mut World, input: &mut Input, gfx: &mut Graphics)
     where
-        F: Fn(&mut World, &mut Input, &mut Graphics, &Surface, f32) -> bool,
+        F: Fn(&mut World, &mut Input, &mut Graphics, &Texture, &Surface, f32) -> bool,
     {
         let path = Path::new(&self.system_font_path);
         let result = self.ttf_context.load_font(path, 16);
@@ -88,6 +90,10 @@ impl System {
         let mut running = true;
         let mut frame_count = 1u64;
         let mut previous_time = SystemTime::now();
+        let texture_creator = gfx.texture_creator();
+        let texture = texture_creator
+            .load_texture(Path::new("images/cat_small.png"))
+            .unwrap(); //TODO:
         while running {
             let current_time = SystemTime::now();
             let result = current_time.duration_since(previous_time);
@@ -103,10 +109,10 @@ impl System {
             let fps_str = format!("{:.4}ms {}", dt.as_secs_f32(), frame_count);
             let fps = font
                 .render(&fps_str)
-                .blended(Color::RGBA(0, 255, 0, 255))
+                .blended(Color::RGBA(255, 255, 0, 255))
                 .unwrap();
 
-            running = frame(world, input, gfx, &fps, dt.as_secs_f32());
+            running = frame(world, input, gfx, &texture, &fps, dt.as_secs_f32());
             frame_count += 1;
         }
     }

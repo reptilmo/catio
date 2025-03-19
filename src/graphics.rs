@@ -1,48 +1,27 @@
 use catphys::Vec2;
-use sdl2::image::LoadTexture;
 use sdl2::pixels::Color;
 use sdl2::rect::Point;
 use sdl2::rect::Rect;
 use sdl2::render::{Texture, TextureCreator, WindowCanvas};
 use sdl2::surface::Surface;
 use sdl2::video::WindowContext;
-use std::path::Path;
 
-pub struct Graphics<'a> {
+pub struct Graphics {
     canvas: WindowCanvas,
-    texture_creator: Option<TextureCreator<WindowContext>>,
-    textures: Vec<Texture<'a>>,
 }
 
 pub struct Render {
-    pub texture_idx: Option<usize>,
     pub color: Color,
-    pub fill: bool,
 }
 
 #[allow(unused)]
-impl<'a> Graphics<'a> {
+impl Graphics {
     pub fn new(c: WindowCanvas) -> Self {
-        Self {
-            canvas: c,
-            texture_creator: None,
-            textures: Vec::<Texture<'a>>::default(),
-        }
+        Self { canvas: c }
     }
 
-    pub fn load_texture(&'a mut self, path: &Path) -> Result<usize, String> {
-        // HA! Lifetimes and their syntax... why does Rust want to be so weird?
-        if self.texture_creator.is_none() {
-            self.texture_creator = Some(self.canvas.texture_creator());
-        }
-
-        let texture = self
-            .texture_creator
-            .as_mut()
-            .expect("texture creator error")
-            .load_texture(path)?;
-        self.textures.push(texture);
-        Ok(self.textures.len() - 1)
+    pub fn texture_creator(&mut self) -> TextureCreator<WindowContext> {
+        self.canvas.texture_creator()
     }
 
     pub fn copy_from_surface(&mut self, surface: &Surface) {
@@ -67,7 +46,7 @@ impl<'a> Graphics<'a> {
     }
 
     pub fn begin_frame(&mut self) {
-        self.canvas.set_draw_color(Color::RGB(50, 50, 50));
+        self.canvas.set_draw_color(Color::RGB(86, 185, 194));
         self.canvas.clear();
     }
 
@@ -162,12 +141,16 @@ impl<'a> Graphics<'a> {
         self.draw_line(v3.x as i32, v3.y as i32, v0.x as i32, v0.y as i32);
     }
 
-    pub fn draw_texture(&mut self, idx: usize, x: i16, y: i16, width: i16, height: i16) {
+    pub fn draw_texture(&mut self, texture: &Texture, dest: Rect, flip: bool, rotation: f32) {
         self.canvas
-            .copy(
-                &self.textures[idx],
+            .copy_ex(
+                texture,
                 None,
-                Some(Rect::new(x.into(), y.into(), width as u32, height as u32)),
+                Some(dest),
+                rotation.into(),
+                None,
+                flip,
+                false,
             )
             .unwrap();
     }
