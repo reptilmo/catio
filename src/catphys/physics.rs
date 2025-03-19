@@ -18,7 +18,7 @@ pub struct Physics {
 }
 
 impl Physics {
-    pub fn new(position: Vec2, mass: f32, rotational_inertia: f32) -> Self {
+    pub fn new(position: Vec2, mass: f32, rotational_inertia: f32, restitution: f32) -> Self {
         let angular_mass = rotational_inertia * mass;
 
         Self {
@@ -33,7 +33,7 @@ impl Physics {
             angular_mass,
             inverse_angular_mass: 1.0 / angular_mass,
             //https://phys.libretexts.org/Courses/Prince_Georges_Community_College/General_Physics_I%3A_Classical_Mechanics/31%3A_Collisions/31.01%3A_The_Coefficient_of_Restitution
-            restitution: 1.0, // 1.0 (bouncy) elastic colision, 0.0 inelastic collision
+            restitution, // 1.0 (bouncy) elastic colision, 0.0 inelastic collision
         }
     }
 

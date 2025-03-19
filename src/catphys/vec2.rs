@@ -3,7 +3,7 @@ use std::ops;
 
 pub const EPSILON: f32 = f32::EPSILON * 10.0;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Default, Copy, Clone, Debug)]
 pub struct Vec2 {
     pub x: f32,
     pub y: f32,

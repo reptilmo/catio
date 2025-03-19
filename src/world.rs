@@ -11,15 +11,13 @@ pub struct World {
 
     // Environment and world forces.
     gravitational_acceleration: Vec2,
-    wind: Vec2,
 
     // Entity-component.
     pub physics_components: Vec<Physics>,
     pub shape_components: Vec<Shape>,
     pub render_components: Vec<Render>,
     pub entities: Vec<Entity>,
-
-    pub player: bool,
+    pub player_entity_idx: Option<usize>,
 }
 
 impl World {
@@ -28,12 +26,11 @@ impl World {
             upper_left: ul,
             lower_right: lr,
             gravitational_acceleration: Vec2::new(0.0, 9.81) * PIXELS_PER_METER,
-            wind: Vec2::new(0.05, 0.0) * PIXELS_PER_METER,
             physics_components: Vec::<Physics>::default(),
             shape_components: Vec::<Shape>::default(),
             render_components: Vec::<Render>::default(),
             entities: Vec::<Entity>::default(),
-            player: false,
+            player_entity_idx: None,
         }
     }
 
@@ -73,6 +70,7 @@ impl World {
             Vec2::new(pos.0 as f32, pos.1 as f32),
             mass,
             ball.rotational_inertia(),
+            0.5,
         ));
         let shape_idx = self.add_shape(ball);
         self.add_entity(
@@ -84,7 +82,7 @@ impl World {
         );
     }
 
-    pub fn spawn_box(&mut self, pos: (i32, i32), width: f32, height: f32, mass: f32) {
+    pub fn spawn_player(&mut self, pos: (i32, i32), width: f32, height: f32, mass: f32) {
         let render = Render {
             texture_idx: None,
             color: Color::RGB(0, 255, 0),
@@ -99,14 +97,17 @@ impl World {
             Vec2::new(pos.0 as f32, pos.1 as f32),
             mass,
             rect.rotational_inertia(),
+            0.2,
         ));
         let shape_idx = self.add_shape(rect);
-        self.add_entity(
-            EntityBuilder::default()
-                .with_shape_component(shape_idx)
-                .with_physics_component(phys_idx)
-                .with_render_component(rend_idx)
-                .build(),
+        self.player_entity_idx = Some(
+            self.add_entity(
+                EntityBuilder::default()
+                    .with_shape_component(shape_idx)
+                    .with_physics_component(phys_idx)
+                    .with_render_component(rend_idx)
+                    .build(),
+            ),
         );
     }
 
@@ -114,11 +115,9 @@ impl World {
         self.physics_components.iter_mut().for_each(|physics| {
             let weight = self.gravitational_acceleration * physics.mass;
             physics.apply_force(weight);
-            //physics.apply_force(self.wind);
             //physics.apply_torque(0.01);
             physics.apply_force(Force::drag(0.001, physics.velocity));
             physics.apply_force(Force::friction(0.65, physics.velocity));
-            //physics.apply_force(wind);
             physics.integrate(delta_time_seconds);
             physics.integrate_angular(delta_time_seconds);
         });
@@ -127,6 +126,8 @@ impl World {
             entity.colliding = false;
         }
 
+        // TODO: Eventually, instead of looping over all the entities, will use some sort of
+        // quadtree. Doing so would allow parallelizing this part.
         if self.entities.len() > 1 {
             for i in 0..self.entities.len() - 1 {
                 let Some(si) = self.entities[i].get_index_for(Component::Shape) else {
@@ -172,7 +173,7 @@ impl World {
                 }
             }
         }
-        // TODO:
+        // TODO: This is a very hacky way to keep objects on screen.
         self.physics_components.iter_mut().for_each(|physics| {
             if physics.position.x <= self.upper_left.x {
                 physics.position.x = self.upper_left.x;

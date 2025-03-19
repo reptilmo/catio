@@ -17,7 +17,7 @@ use crate::entity::Component;
 use crate::graphics::Graphics;
 use crate::input::Input;
 use crate::system::System;
-use crate::world::World;
+use crate::world::{World, PIXELS_PER_METER};
 use catphys::{Shape, Vec2};
 
 const WIDTH: u32 = 1200u32;
@@ -43,19 +43,48 @@ fn update_world(
         still_running = false;
     }
 
-    if input.key_pressed(Scancode::P) && !input.key_was_pressed(Scancode::P) && !world.player {
-        world.spawn_box(((WIDTH / 2) as i32, (HEIGHT / 2) as i32), 2.0, 2.0, 1.0);
-        world.player = true;
+    if input.key_pressed(Scancode::P)
+        && !input.key_was_pressed(Scancode::P)
+        && world.player_entity_idx.is_none()
+    {
+        world.spawn_player(((WIDTH / 2) as i32, (HEIGHT / 2) as i32), 0.5, 0.5, 1.0);
     }
 
-    if input.mouse_pressed(MouseButton::Left) && !input.mouse_was_pressed(MouseButton::Left) {
-        for _ in 0..10 {
-            world.spawn_ball(input.mouse_position(), 0.05, 1.0);
+    if input.key_pressed(Scancode::Space) && !input.key_was_pressed(Scancode::Space) {
+        // TODO: Currently the thing basically flies if you keep pressing space.
+        if let Some(player_idx) = world.player_entity_idx {
+            let player_phys_idx = world.entities[player_idx].get_index_for(Component::Physics);
+            if let Some(idx) = player_phys_idx {
+                world.physics_components[idx].position.y -= 0.5 * PIXELS_PER_METER;
+                // Hacky.
+            }
         }
-    } else if input.mouse_pressed(MouseButton::Right)
-        && !input.mouse_was_pressed(MouseButton::Right)
+    }
+
+    if input.key_pressed(Scancode::Right) {
+        if let Some(player_idx) = world.player_entity_idx {
+            let player_phys_idx = world.entities[player_idx].get_index_for(Component::Physics);
+            if let Some(idx) = player_phys_idx {
+                world.physics_components[idx].apply_impulse(Vec2::new(1.0, 0.0) * PIXELS_PER_METER);
+            }
+        }
+    }
+
+    if input.key_pressed(Scancode::Left) {
+        if let Some(player_idx) = world.player_entity_idx {
+            let player_phys_idx = world.entities[player_idx].get_index_for(Component::Physics);
+            if let Some(idx) = player_phys_idx {
+                world.physics_components[idx]
+                    .apply_impulse(Vec2::new(-1.0, 0.0) * PIXELS_PER_METER);
+            }
+        }
+    }
+
+    if input.mouse_pressed(MouseButton::Right) && !input.mouse_was_pressed(MouseButton::Right) {
+        world.spawn_ball(input.mouse_position(), 0.05, 10.0);
+    } else if input.mouse_pressed(MouseButton::Left) && !input.mouse_was_pressed(MouseButton::Left)
     {
-        world.spawn_ball(input.mouse_position(), 0.5, 10.0);
+        world.spawn_ball(input.mouse_position(), 0.4, 100.0);
     }
 
     world.update_physics(delta_time_secs);

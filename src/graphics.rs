@@ -46,8 +46,8 @@ impl<'a> Graphics<'a> {
     }
 
     pub fn copy_from_surface(&mut self, surface: &Surface) {
-        // TODO: There is a memory leak here. I think the 
-        // leak is caused by how TextureCreator holds on to 
+        // TODO: There is a memory leak here. I think the
+        // leak is caused by how TextureCreator holds on to
         // all the textures it creates until it's dropped.
         // Peshaps it's possible to create a streaming texture once.
         let texture_creator = self.canvas.texture_creator();
